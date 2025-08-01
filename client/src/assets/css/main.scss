@@ -1,0 +1,261 @@
+// 全局样式
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  line-height: 1.6;
+  color: #333;
+  background-color: #f8f9fa;
+}
+
+a {
+  color: #409eff;
+  text-decoration: none;
+  transition: color 0.3s;
+
+  &:hover {
+    color: #66b1ff;
+  }
+}
+
+// 内容区域
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+.content-wrapper {
+  min-height: calc(100vh - 120px);
+  padding: 20px 0;
+}
+
+// 卡片样式
+.card {
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  transition: box-shadow 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+  }
+}
+
+// 按钮样式增强
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+
+  &.btn-primary {
+    background: #409eff;
+    color: white;
+
+    &:hover {
+      background: #66b1ff;
+    }
+  }
+
+  &.btn-secondary {
+    background: #909399;
+    color: white;
+
+    &:hover {
+      background: #a6a9ad;
+    }
+  }
+}
+
+// 表单样式
+.form-container {
+  max-width: 400px;
+  margin: 0 auto;
+  padding: 40px 20px;
+}
+
+.form-title {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+}
+
+// 响应式设计
+@media (max-width: 768px) {
+  .container {
+    padding: 0 15px;
+  }
+
+  .content-wrapper {
+    padding: 15px 0;
+  }
+
+  .form-container {
+    padding: 20px 15px;
+  }
+}
+
+// 工具类
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.mb-10 {
+  margin-bottom: 10px;
+}
+
+.mb-20 {
+  margin-bottom: 20px;
+}
+
+.mb-30 {
+  margin-bottom: 30px;
+}
+
+.mt-10 {
+  margin-top: 10px;
+}
+
+.mt-20 {
+  margin-top: 20px;
+}
+
+.mt-30 {
+  margin-top: 30px;
+}
+
+// 加载动画
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+}
+
+// 空状态
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: #909399;
+
+  .empty-icon {
+    font-size: 64px;
+    margin-bottom: 16px;
+  }
+
+  .empty-text {
+    font-size: 14px;
+  }
+}
+
+// 文章内容样式
+.article-content {
+  line-height: 1.8;
+  color: #333;
+
+  h1, h2, h3, h4, h5, h6 {
+    margin: 24px 0 16px 0;
+    font-weight: 600;
+    line-height: 1.25;
+  }
+
+  h1 {
+    font-size: 2em;
+    border-bottom: 1px solid #eaecef;
+    padding-bottom: 8px;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  h3 {
+    font-size: 1.25em;
+  }
+
+  p {
+    margin: 16px 0;
+  }
+
+  ul, ol {
+    margin: 16px 0;
+    padding-left: 2em;
+  }
+
+  li {
+    margin: 4px 0;
+  }
+
+  blockquote {
+    margin: 16px 0;
+    padding: 0 16px;
+    border-left: 4px solid #dfe2e5;
+    color: #6a737d;
+  }
+
+  code {
+    background: #f3f4f6;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, monospace;
+    font-size: 0.9em;
+  }
+
+  pre {
+    background: #f6f8fa;
+    padding: 16px;
+    border-radius: 6px;
+    overflow-x: auto;
+    margin: 16px 0;
+
+    code {
+      background: none;
+      padding: 0;
+    }
+  }
+
+  img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 4px;
+    margin: 16px 0;
+  }
+
+  table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 16px 0;
+
+    th, td {
+      border: 1px solid #dfe2e5;
+      padding: 8px 12px;
+      text-align: left;
+    }
+
+    th {
+      background: #f6f8fa;
+      font-weight: 600;
+    }
+  }
+}
