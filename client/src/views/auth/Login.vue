@@ -139,7 +139,7 @@ const handleLogin = async () => {
     ElMessage.success('登录成功')
 
     // 跳转到原来要访问的页面，或默认到首页
-    const redirect = route.query.redirect as string || '/'
+    const redirect = route.query.redirect || '/'
     router.push(redirect)
 
   } catch (error) {
