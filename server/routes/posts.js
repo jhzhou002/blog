@@ -6,7 +6,7 @@ const { validate, validateQuery, schemas } = require('../utils/validation');
 const router = express.Router();
 
 // 获取文章列表（公开接口，支持可选认证）
-router.get('/', optionalAuth, validateQuery(schemas.pagination), postController.getPosts);
+router.get('/', optionalAuth, validateQuery(schemas.postQuery), postController.getPosts);
 
 // 获取单篇文章（公开接口，支持可选认证）
 router.get('/:slug', optionalAuth, postController.getPost);

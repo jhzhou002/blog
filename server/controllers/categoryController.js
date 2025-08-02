@@ -1,6 +1,55 @@
 const { query } = require('../config/database');
 const { success, error } = require('../utils/response');
 
+// 辅助函数：生成slug
+const generateSlug = (name) => {
+    return name
+        .toLowerCase()
+        .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
+        .replace(/[\s_-]+/g, '-')
+        .replace(/^-+|-+$/g, '');
+};
+
+// 辅助函数：构建分类树
+const buildCategoryTree = (categories) => {
+    const categoryMap = new Map();
+    const rootCategories = [];
+
+    // 第一遍：创建所有分类的映射
+    categories.forEach(category => {
+        category.children = [];
+        categoryMap.set(category.id, category);
+    });
+
+    // 第二遍：构建树形结构
+    categories.forEach(category => {
+        if (category.parent_id) {
+            const parent = categoryMap.get(category.parent_id);
+            if (parent) {
+                parent.children.push(category);
+            }
+        } else {
+            rootCategories.push(category);
+        }
+    });
+
+    return rootCategories;
+};
+
+// 辅助函数：检查是否会造成循环引用
+const checkCategoryLoop = async (categoryId, parentId) => {
+    if (categoryId == parentId) {
+        return true;
+    }
+
+    const parent = await query('SELECT parent_id FROM categories WHERE id = ?', [parentId]);
+    if (parent.length === 0 || !parent[0].parent_id) {
+        return false;
+    }
+
+    return await checkCategoryLoop(categoryId, parent[0].parent_id);
+};
+
 class CategoryController {
     // 获取所有分类
     async getCategories(req, res) {
@@ -18,7 +67,7 @@ class CategoryController {
             `);
 
             // 构建树形结构
-            const categoryTree = this.buildCategoryTree(categories);
+            const categoryTree = buildCategoryTree(categories);
 
             res.json(success(categoryTree, '获取分类成功'));
 
@@ -63,7 +112,7 @@ class CategoryController {
             const { name, description, parent_id } = req.body;
 
             // 生成slug
-            const slug = this.generateSlug(name);
+            const slug = generateSlug(name);
 
             // 检查slug是否已存在
             const existingCategory = await query('SELECT id FROM categories WHERE slug = ?', [slug]);
@@ -114,7 +163,7 @@ class CategoryController {
 
             // 如果名称改变，重新生成slug
             if (name && name !== existingCategory[0].name) {
-                slug = this.generateSlug(name);
+                slug = generateSlug(name);
                 
                 // 检查新slug是否已存在
                 const duplicateSlug = await query('SELECT id FROM categories WHERE slug = ? AND id != ?', [slug, id]);
@@ -125,7 +174,7 @@ class CategoryController {
 
             // 如果设置了父分类，检查是否会造成循环引用
             if (parent_id && parent_id != existingCategory[0].parent_id) {
-                const wouldCreateCycle = await this.checkCategoryLoop(id, parent_id);
+                const wouldCreateCycle = await checkCategoryLoop(id, parent_id);
                 if (wouldCreateCycle) {
                     return res.status(400).json(error('不能设置子分类为父分类'));
                 }
@@ -188,55 +237,6 @@ class CategoryController {
             console.error('删除分类错误:', err);
             res.status(500).json(error('删除分类失败'));
         }
-    }
-
-    // 辅助方法：生成slug
-    generateSlug(name) {
-        return name
-            .toLowerCase()
-            .replace(/[^\w\u4e00-\u9fa5\s-]/g, '')
-            .replace(/[\s_-]+/g, '-')
-            .replace(/^-+|-+$/g, '');
-    }
-
-    // 辅助方法：构建分类树
-    buildCategoryTree(categories) {
-        const categoryMap = new Map();
-        const rootCategories = [];
-
-        // 第一遍：创建所有分类的映射
-        categories.forEach(category => {
-            category.children = [];
-            categoryMap.set(category.id, category);
-        });
-
-        // 第二遍：构建树形结构
-        categories.forEach(category => {
-            if (category.parent_id) {
-                const parent = categoryMap.get(category.parent_id);
-                if (parent) {
-                    parent.children.push(category);
-                }
-            } else {
-                rootCategories.push(category);
-            }
-        });
-
-        return rootCategories;
-    }
-
-    // 辅助方法：检查是否会造成循环引用
-    async checkCategoryLoop(categoryId, parentId) {
-        if (categoryId == parentId) {
-            return true;
-        }
-
-        const parent = await query('SELECT parent_id FROM categories WHERE id = ?', [parentId]);
-        if (parent.length === 0 || !parent[0].parent_id) {
-            return false;
-        }
-
-        return await this.checkCategoryLoop(categoryId, parent[0].parent_id);
     }
 }
 

@@ -181,6 +181,7 @@ class TagController {
     async getPopularTags(req, res) {
         try {
             const { limit = 20 } = req.query;
+            const limitNum = parseInt(limit);
 
             const tags = await query(`
                 SELECT 
@@ -193,7 +194,7 @@ class TagController {
                 HAVING post_count > 0
                 ORDER BY post_count DESC, t.created_at DESC
                 LIMIT ?
-            `, [parseInt(limit)]);
+            `, [limitNum]);
 
             res.json(success(tags, '获取热门标签成功'));
 

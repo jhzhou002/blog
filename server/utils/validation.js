@@ -86,6 +86,19 @@ const schemas = {
     pagination: Joi.object({
         page: Joi.number().integer().min(1).default(1),
         limit: Joi.number().integer().min(1).max(100).default(10)
+    }).unknown(true),  // 允许其他查询参数
+
+    // 文章查询验证
+    postQuery: Joi.object({
+        page: Joi.number().integer().min(1).default(1),
+        limit: Joi.number().integer().min(1).max(100).default(10),
+        status: Joi.string().valid('draft', 'published', 'private').optional(),
+        category_id: Joi.number().integer().positive().optional(),
+        author_id: Joi.number().integer().positive().optional(),
+        search: Joi.string().max(200).optional(),
+        sort: Joi.string().valid('created_at', 'updated_at', 'published_at', 'view_count').default('created_at'),
+        order: Joi.string().valid('ASC', 'DESC').default('DESC'),
+        tag: Joi.string().optional()
     })
 };
 
