@@ -2,12 +2,13 @@ from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.utils import timezone
 from django.urls import reverse
+from .utils import post_image_path, avatar_image_path
 
 
 class User(AbstractUser):
     """Extended User model"""
     is_admin = models.BooleanField(default=False, verbose_name='是否管理员')
-    avatar = models.ImageField(upload_to='avatars/', blank=True, null=True, verbose_name='头像')
+    avatar = models.ImageField(upload_to=avatar_image_path, blank=True, null=True, verbose_name='头像')
     
     class Meta:
         verbose_name = '用户'
@@ -50,7 +51,7 @@ class Post(models.Model):
     title = models.CharField(max_length=200, verbose_name='标题')
     summary = models.TextField(max_length=500, verbose_name='摘要')
     content = models.TextField(verbose_name='内容')
-    cover_image = models.ImageField(upload_to='posts/', blank=True, null=True, verbose_name='封面图片')
+    cover_image = models.ImageField(upload_to=post_image_path, blank=True, null=True, verbose_name='封面图片')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, blank=True, verbose_name='分类')
     tags = models.ManyToManyField(Tag, blank=True, verbose_name='标签')
     author = models.ForeignKey(User, on_delete=models.CASCADE, verbose_name='作者')
