@@ -100,8 +100,9 @@
             <div class="posts-section">
                 {% for post in posts %}
                 <article class="post-card">
-                    <div class="row g-0">
-                        <div class="col-md-4">
+                    <div class="post-card-content">
+                        <!-- 左侧封面图 -->
+                        <div class="post-card-img-wrapper">
                             <a href="{{ post.get_absolute_url }}">
                                 {% if post.cover_image %}
                                     <img src="{{ post.cover_image.url }}" class="post-card-img" alt="{{ post.title }}">
@@ -110,8 +111,10 @@
                                 {% endif %}
                             </a>
                         </div>
-                        <div class="col-md-8">
-                            <div class="post-card-body">
+                        
+                        <!-- 右侧内容区 -->
+                        <div class="post-card-body">
+                            <div class="post-card-main">
                                 {% if post.category %}
                                     <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
                                         {{ post.category.name }}
@@ -120,23 +123,41 @@
                                 
                                 <h3><a href="{{ post.get_absolute_url }}" class="post-title">{{ post.title }}</a></h3>
                                 
-                                <p class="post-summary">{{ post.summary }}</p>
-                                
-                                <div class="post-meta">
-                                    <span><i class="far fa-clock"></i> {{ post.created_at|date:"Y-m-d" }}</span>
-                                    <span><i class="far fa-eye"></i> {{ post.views }}</span>
-                                    <span><i class="far fa-heart"></i> {{ post.likes }}</span>
-                                    <span><i class="far fa-star"></i> {{ post.favorites }}</span>
-                                    <span><i class="far fa-comment"></i> {{ post.comments.count }}</span>
-                                </div>
+                                <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
                                 
                                 {% if post.tags.exists %}
-                                <div class="post-tags mt-2">
-                                    {% for tag in post.tags.all %}
+                                <div class="post-tags">
+                                    {% for tag in post.tags.all|slice:":3" %}
                                         <a href="{% url 'blog:tag_posts' tag.pk %}" class="tag"># {{ tag.name }}</a>
                                     {% endfor %}
                                 </div>
                                 {% endif %}
+                            </div>
+                            
+                            <!-- 底部统计数据 -->
+                            <div class="post-card-footer">
+                                <div class="post-stats">
+                                    <span class="post-stat">
+                                        <i class="far fa-calendar-alt"></i>
+                                        {{ post.created_at|date:"m-d" }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-eye"></i>
+                                        {{ post.views }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-heart"></i>
+                                        {{ post.likes }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-star"></i>
+                                        {{ post.favorites }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-comment"></i>
+                                        {{ post.comments.count }}
+                                    </span>
+                                </div>
                             </div>
                         </div>
                     </div>

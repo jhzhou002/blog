@@ -244,32 +244,26 @@ if ('IntersectionObserver' in window) {
 }
 
 // Back to top button
-function addBackToTopButton() {
-    const backToTopHTML = `
-        <button id="backToTop" class="btn btn-primary position-fixed d-none" 
-                style="bottom: 20px; right: 20px; border-radius: 50%; width: 50px; height: 50px; z-index: 1000;">
-            <i class="fas fa-arrow-up"></i>
-        </button>
-    `;
-    document.body.insertAdjacentHTML('beforeend', backToTopHTML);
-    
+function initBackToTopButton() {
     const backToTopBtn = document.getElementById('backToTop');
     
-    window.addEventListener('scroll', () => {
-        if (window.pageYOffset > 300) {
-            backToTopBtn.classList.remove('d-none');
-        } else {
-            backToTopBtn.classList.add('d-none');
-        }
-    });
-    
-    backToTopBtn.addEventListener('click', () => {
-        window.scrollTo({
-            top: 0,
-            behavior: 'smooth'
+    if (backToTopBtn) {
+        window.addEventListener('scroll', () => {
+            if (window.pageYOffset > 300) {
+                backToTopBtn.classList.add('show');
+            } else {
+                backToTopBtn.classList.remove('show');
+            }
         });
-    });
+        
+        backToTopBtn.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    }
 }
 
 // Initialize back to top button
-addBackToTopButton();
+initBackToTopButton();
