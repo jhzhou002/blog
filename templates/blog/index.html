@@ -23,15 +23,15 @@
             <!-- Featured Carousel -->
             {% if featured_posts %}
             <div id="featuredCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-                <div class="carousel-inner">
+                <div class="carousel-inner rounded-carousel">
                     {% for post in featured_posts %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
                         {% if post.cover_image %}
-                            <img src="{{ post.cover_image.url }}" class="d-block w-100" alt="{{ post.title }}">
+                            <img src="{{ post.cover_image.url }}" class="d-block w-100 rounded-carousel-img" alt="{{ post.title }}">
                         {% else %}
-                            <img src="{% static 'images/default-post.jpg' %}" class="d-block w-100" alt="{{ post.title }}">
+                            <img src="{% static 'images/default-post.jpg' %}" class="d-block w-100 rounded-carousel-img" alt="{{ post.title }}">
                         {% endif %}
-                        <div class="carousel-caption">
+                        <div class="carousel-caption rounded">
                             <h5><a href="{{ post.get_absolute_url }}" class="text-white text-decoration-none">{{ post.title }}</a></h5>
                             <p>{{ post.summary|truncatewords:15 }}</p>
                         </div>

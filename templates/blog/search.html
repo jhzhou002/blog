@@ -1,0 +1,118 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <h2 class="mb-4">
+        <i class="fas fa-search me-2"></i>
+        {% if query %}
+            搜索结果：{{ query }}
+        {% else %}
+            搜索文章
+        {% endif %}
+    </h2>
+    
+    <!-- Search Form -->
+    <div class="card shadow-sm mb-4">
+        <div class="card-body">
+            <form method="GET" action="{% url 'blog:search' %}" class="row g-3">
+                <div class="col-md-9">
+                    <input type="search" class="form-control form-control-lg" 
+                           name="q" placeholder="输入关键词搜索文章..." 
+                           value="{{ query }}" autofocus>
+                </div>
+                <div class="col-md-3">
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-search me-2"></i>搜索
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <!-- Search Results -->
+    {% if query %}
+        {% if posts %}
+            <p class="text-muted mb-4">找到 {{ posts.paginator.count }} 篇相关文章</p>
+            
+            <div class="row">
+                {% for post in posts %}
+                <div class="col-12 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-9">
+                                    <h5 class="card-title">
+                                        <a href="{{ post.get_absolute_url }}" class="text-decoration-none">
+                                            {{ post.title }}
+                                        </a>
+                                    </h5>
+                                    <p class="card-text">{{ post.summary }}</p>
+                                    <div class="post-meta">
+                                        <span><i class="far fa-calendar"></i> {{ post.created_at|date:"Y-m-d" }}</span>
+                                        <span><i class="far fa-eye"></i> {{ post.views }}</span>
+                                        {% if post.category %}
+                                            <span><i class="far fa-folder"></i> {{ post.category.name }}</span>
+                                        {% endif %}
+                                    </div>
+                                </div>
+                                <div class="col-md-3">
+                                    {% if post.cover_image %}
+                                        <img src="{{ post.cover_image.url }}" class="img-fluid rounded" alt="{{ post.title }}">
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if posts.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if posts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ posts.previous_page_number }}">上一页</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in posts.paginator.page_range %}
+                        {% if posts.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?q={{ query }}&page={{ num }}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?q={{ query }}&page={{ posts.next_page_number }}">下一页</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h4 class="text-muted">没有找到相关文章</h4>
+                <p class="text-muted">请尝试其他关键词</p>
+            </div>
+        {% endif %}
+    {% else %}
+        <div class="text-center py-5">
+            <i class="fas fa-search fa-3x text-muted mb-3"></i>
+            <h4 class="text-muted">请输入搜索关键词</h4>
+            <p class="text-muted">在上方搜索框中输入关键词来搜索文章</p>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,107 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card shadow-custom mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0"><i class="fas fa-user me-2"></i>个人信息</h4>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-3 text-center mb-3">
+                            {% if user.avatar %}
+                                <img src="{{ user.avatar.url }}" class="rounded-circle mb-2" width="100" height="100" alt="头像">
+                            {% else %}
+                                <div class="bg-light rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                    <i class="fas fa-user fa-2x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-9">
+                            <table class="table table-borderless">
+                                <tr>
+                                    <td><strong>用户名：</strong></td>
+                                    <td>{{ user.username }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>邮箱：</strong></td>
+                                    <td>{{ user.email }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>注册时间：</strong></td>
+                                    <td>{{ user.date_joined|date:"Y年m月d日" }}</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>角色：</strong></td>
+                                    <td>
+                                        {% if user.is_admin %}
+                                            <span class="badge bg-danger">管理员</span>
+                                        {% else %}
+                                            <span class="badge bg-primary">普通用户</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- 我的评论 -->
+            <div class="card shadow-custom mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>我的评论</h5>
+                </div>
+                <div class="card-body">
+                    {% for comment in user_comments %}
+                        <div class="comment-card">
+                            <div class="comment-author">
+                                <a href="{{ comment.post.get_absolute_url }}" class="text-decoration-none">
+                                    {{ comment.post.title }}
+                                </a>
+                            </div>
+                            <div class="comment-date">{{ comment.created_at|date:"Y-m-d H:i" }}</div>
+                            <div class="comment-content">{{ comment.content }}</div>
+                        </div>
+                    {% empty %}
+                        <p class="text-muted">暂无评论</p>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-lg-4">
+            <!-- 我的点赞 -->
+            <div class="sidebar-card">
+                <h5><i class="fas fa-heart me-2"></i>我的点赞</h5>
+                {% for post in liked_posts %}
+                    <div class="recent-post">
+                        <a href="{{ post.get_absolute_url }}" class="recent-post-title">{{ post.title }}</a>
+                        <div class="recent-post-date">{{ post.created_at|date:"m月d日" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">暂无点赞文章</p>
+                {% endfor %}
+            </div>
+            
+            <!-- 我的收藏 -->
+            <div class="sidebar-card">
+                <h5><i class="fas fa-star me-2"></i>我的收藏</h5>
+                {% for post in favorited_posts %}
+                    <div class="recent-post">
+                        <a href="{{ post.get_absolute_url }}" class="recent-post-title">{{ post.title }}</a>
+                        <div class="recent-post-date">{{ post.created_at|date:"m月d日" }}</div>
+                    </div>
+                {% empty %}
+                    <p class="text-muted">暂无收藏文章</p>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
