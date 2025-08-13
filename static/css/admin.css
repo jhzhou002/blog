@@ -415,3 +415,24 @@ body {
         opacity: 1;
     }
 }
+
+/* Sidebar User Profile */
+.sidebar-user-profile {
+    position: absolute;
+    bottom: 80px;
+    left: 0;
+    right: 0;
+    background: rgba(59, 130, 246, 0.1);
+    border-radius: 10px;
+    margin: 0 15px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.sidebar-user-profile .dropdown-menu {
+    background: white;
+    border: none;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    border-radius: 8px;
+    margin-bottom: 10px;
+}

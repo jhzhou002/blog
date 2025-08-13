@@ -18,8 +18,20 @@ def index(request):
     # 轮播图横幅
     banners = Banner.objects.filter(is_active=True)[:5]
     
-    # 获取已发布的文章
+    # 获取筛选参数
+    category_id = request.GET.get('category')
+    
+    # 获取已发布的文章，支持分类筛选
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
+    
+    # 当前选中的分类
+    current_category = None
+    if category_id:
+        try:
+            current_category = Category.objects.get(id=category_id)
+            posts = posts.filter(category=current_category)
+        except Category.DoesNotExist:
+            pass
     
     # 分页
     paginator = Paginator(posts, 5)  # 每页5篇文章
@@ -45,6 +57,7 @@ def index(request):
         'recommended_posts': recommended_posts,
         'categories': categories,
         'tags': tags,
+        'current_category': current_category,
         'site_name': settings.SITE_NAME,
         'site_description': settings.SITE_DESCRIPTION,
     }

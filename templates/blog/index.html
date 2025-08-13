@@ -6,27 +6,25 @@
 {% block content %}
 <!-- Hero Banner Carousel -->
 {% if banners %}
-<section class="hero-banner-section">
-    <div class="container-fluid px-0">
+<div class="container">
+    <div class="hero-banner-container">
         <div id="heroBannerCarousel" class="carousel slide hero-carousel" data-bs-ride="carousel">
             <div class="carousel-inner">
                 {% for banner in banners %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <div class="hero-banner" style="background-image: url('{{ banner.image.url }}');">
                         <div class="hero-overlay"></div>
-                        <div class="container">
-                            <div class="row justify-content-center align-items-center min-vh-50">
-                                <div class="col-lg-8 text-center">
-                                    <h1 class="hero-title">{{ banner.title }}</h1>
-                                    {% if banner.subtitle %}
-                                        <p class="hero-subtitle">{{ banner.subtitle }}</p>
-                                    {% endif %}
-                                    {% if banner.get_link_url != '#' %}
-                                        <a href="{{ banner.get_link_url }}" class="btn btn-primary btn-lg mt-3">
-                                            {% if banner.post %}阅读更多{% else %}了解详情{% endif %}
-                                        </a>
-                                    {% endif %}
-                                </div>
+                        <div class="hero-content">
+                            <div class="text-center">
+                                <h1 class="hero-title">{{ banner.title }}</h1>
+                                {% if banner.subtitle %}
+                                    <p class="hero-subtitle">{{ banner.subtitle }}</p>
+                                {% endif %}
+                                {% if banner.get_link_url != '#' %}
+                                    <a href="{{ banner.get_link_url }}" class="btn btn-primary btn-lg mt-3">
+                                        {% if banner.post %}阅读更多{% else %}了解详情{% endif %}
+                                    </a>
+                                {% endif %}
                             </div>
                         </div>
                     </div>
@@ -50,7 +48,7 @@
             {% endif %}
         </div>
     </div>
-</section>
+</div>
 {% else %}
 <!-- Default Hero Section if no banners -->
 <section class="hero-section">

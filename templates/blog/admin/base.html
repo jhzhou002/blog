@@ -114,6 +114,42 @@
             <!-- Divider -->
             <hr class="sidebar-divider d-none d-md-block">
 
+            <!-- User Profile in Sidebar -->
+            <div class="sidebar-user-profile">
+                <div class="d-flex align-items-center p-3">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 45px; height: 45px;">
+                        {% if user.avatar %}
+                            <img src="{{ user.avatar.url }}" class="rounded-circle" width="45" height="45" alt="用户头像">
+                        {% else %}
+                            <i class="fas fa-user text-muted"></i>
+                        {% endif %}
+                    </div>
+                    <div class="flex-grow-1">
+                        <div class="fw-bold text-white small">{{ user.username }}</div>
+                        <div class="text-white-50 small">
+                            {% if user.is_superuser %}
+                                超级管理员
+                            {% elif user.is_admin %}
+                                管理员
+                            {% else %}
+                                用户
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="dropdown">
+                        <a class="text-white-50" href="#" data-bs-toggle="dropdown">
+                            <i class="fas fa-cog"></i>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li><a class="dropdown-item" href="{% url 'blog:profile' %}">个人中心</a></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:index' %}">返回前台</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="{% url 'blog:logout' %}">退出登录</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
             <!-- Sidebar Toggler (Sidebar) -->
             <div class="text-center d-none d-md-inline">
                 <button class="rounded-circle border-0" id="sidebarToggle"></button>
@@ -132,39 +168,13 @@
                         <i class="fa fa-bars"></i>
                     </button>
 
-                    <!-- Topbar Navbar -->
-                    <ul class="navbar-nav ml-auto">
-                        <!-- Nav Item - User Information -->
-                        <li class="nav-item dropdown no-arrow">
-                            <a class="nav-link dropdown-toggle" href="#" id="userDropdown" role="button" 
-                               data-bs-toggle="dropdown">
-                                <span class="mr-2 d-none d-lg-inline text-gray-600 small">{{ user.username }}</span>
-                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user text-muted"></i>
-                                </div>
-                            </a>
-                            <!-- Dropdown - User Information -->
-                            <div class="dropdown-menu dropdown-menu-right shadow animated--grow-in">
-                                <a class="dropdown-item" href="{% url 'blog:profile' %}">
-                                    <i class="fas fa-user fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    个人资料
-                                </a>
-                                <a class="dropdown-item" href="{% url 'blog:admin_settings' %}">
-                                    <i class="fas fa-cogs fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    设置
-                                </a>
-                                <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="{% url 'blog:index' %}">
-                                    <i class="fas fa-home fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    返回首页
-                                </a>
-                                <a class="dropdown-item" href="{% url 'blog:logout' %}">
-                                    <i class="fas fa-sign-out-alt fa-sm fa-fw mr-2 text-gray-400"></i>
-                                    退出登录
-                                </a>
-                            </div>
-                        </li>
-                    </ul>
+                    <!-- Page Title -->
+                    <div class="d-flex align-items-center">
+                        <h1 class="h3 mb-0 text-gray-800">
+                            {% block page_title %}管理控制台{% endblock %}
+                        </h1>
+                        {% block page_actions %}{% endblock %}
+                    </div>
                 </nav>
                 <!-- End of Topbar -->
 

@@ -28,14 +28,15 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav me-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blog:index' %}">首页</a>
+                        <a class="nav-link {% if request.resolver_match.url_name == 'index' and not request.GET.category %}active{% endif %}" 
+                           href="{% url 'blog:index' %}">全部</a>
                     </li>
+                    {% for category in site_categories %}
                     <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blog:categories' %}">分类</a>
+                        <a class="nav-link {% if request.GET.category == category.id|stringformat:'s' %}active{% endif %}" 
+                           href="{% url 'blog:index' %}?category={{ category.id }}">{{ category.name }}</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="{% url 'blog:tags' %}">标签</a>
-                    </li>
+                    {% endfor %}
                     <li class="nav-item">
                         <a class="nav-link" href="{% url 'blog:about' %}">关于</a>
                     </li>

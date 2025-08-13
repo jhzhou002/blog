@@ -42,10 +42,10 @@ body {
 }
 
 /* Hero Banner Carousel */
-.hero-banner-section {
+.hero-banner-container {
     position: relative;
     margin-bottom: 40px;
-    padding: 0 50px; /* 增加左右留边距 */
+    padding: 0; /* 移除padding，因为现在在container内 */
 }
 
 .hero-carousel {
@@ -149,8 +149,8 @@ body {
 }
 
 @media (max-width: 768px) {
-    .hero-banner-section {
-        padding: 0 20px; /* 小屏幕也增加边距 */
+    .hero-banner-container {
+        padding: 0; /* 小屏幕也移除边距，因为现在在container内 */
     }
     
     .hero-carousel,
