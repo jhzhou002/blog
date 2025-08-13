@@ -19,13 +19,13 @@
     <!-- Page Wrapper -->
     <div id="wrapper">
         <!-- Sidebar -->
-        <ul class="navbar-nav bg-gradient-primary sidebar sidebar-dark accordion" id="accordionSidebar">
+        <ul class="navbar-nav sidebar accordion" id="accordionSidebar">
             <!-- Sidebar - Brand -->
-            <a class="sidebar-brand d-flex align-items-center justify-content-center" href="{% url 'blog:admin_dashboard' %}">
-                <div class="sidebar-brand-icon rotate-n-15">
+            <a class="sidebar-brand" href="{% url 'blog:admin_dashboard' %}">
+                <div class="sidebar-brand-icon">
                     <i class="fas fa-cog"></i>
                 </div>
-                <div class="sidebar-brand-text mx-3">MyBlog Admin</div>
+                <div class="sidebar-brand-text">MyBlog Admin</div>
             </a>
 
             <!-- Divider -->
@@ -118,7 +118,7 @@
             <!-- Main Content -->
             <div id="content">
                 <!-- Topbar -->
-                <nav class="navbar navbar-expand navbar-light bg-white topbar mb-4 static-top shadow">
+                <nav class="navbar navbar-expand navbar-light topbar mb-4 static-top shadow">
                     <!-- Sidebar Toggle (Topbar) -->
                     <button id="sidebarToggleTop" class="btn btn-link d-md-none rounded-circle mr-3">
                         <i class="fa fa-bars"></i>
@@ -176,10 +176,10 @@
             <!-- End of Main Content -->
 
             <!-- Footer -->
-            <footer class="sticky-footer bg-white">
+            <footer class="sticky-footer">
                 <div class="container my-auto">
                     <div class="copyright text-center my-auto">
-                        <span>&copy; 2024 MyBlog Admin Panel. All rights reserved.</span>
+                        <span class="text-gray-600">&copy; 2024 MyBlog Admin Panel. All rights reserved.</span>
                     </div>
                 </div>
             </footer>
