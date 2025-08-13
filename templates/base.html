@@ -59,8 +59,9 @@
                             </a>
                             <ul class="dropdown-menu">
                                 <li><a class="dropdown-item" href="{% url 'blog:profile' %}">个人中心</a></li>
-                                {% if user.is_admin %}
+                                {% if user.is_admin or user.is_superuser %}
                                     <li><a class="dropdown-item" href="{% url 'blog:admin_dashboard' %}">后台管理</a></li>
+                                    <li><a class="dropdown-item" href="/admin/">Django Admin</a></li>
                                 {% endif %}
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="{% url 'blog:logout' %}">退出登录</a></li>

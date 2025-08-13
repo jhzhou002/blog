@@ -373,3 +373,252 @@ def admin_dashboard(request):
     }
     
     return render(request, 'blog/admin/dashboard.html', context)
+
+
+@login_required
+def admin_posts(request):
+    """文章管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    posts = Post.objects.all().select_related('category', 'author').order_by('-created_at')
+    
+    paginator = Paginator(posts, 20)
+    page_number = request.GET.get('page')
+    posts = paginator.get_page(page_number)
+    
+    context = {
+        'title': '文章管理',
+        'posts': posts,
+    }
+    
+    return render(request, 'blog/admin/posts.html', context)
+
+
+@login_required
+def admin_post_add(request):
+    """添加文章"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        summary = request.POST.get('summary')
+        content = request.POST.get('content')
+        category_id = request.POST.get('category')
+        tag_ids = request.POST.getlist('tags')
+        is_published = request.POST.get('is_published') == 'on'
+        is_featured = request.POST.get('is_featured') == 'on'
+        cover_image = request.FILES.get('cover_image')
+        
+        if title and content:
+            post = Post.objects.create(
+                title=title,
+                summary=summary,
+                content=content,
+                category_id=category_id if category_id else None,
+                author=request.user,
+                is_published=is_published,
+                is_featured=is_featured,
+                cover_image=cover_image
+            )
+            
+            if tag_ids:
+                post.tags.set(tag_ids)
+            
+            messages.success(request, '文章创建成功')
+            return redirect('blog:admin_posts')
+        else:
+            messages.error(request, '标题和内容不能为空')
+    
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
+    
+    context = {
+        'title': '添加文章',
+        'categories': categories,
+        'tags': tags,
+    }
+    
+    return render(request, 'blog/admin/post_form.html', context)
+
+
+@login_required
+def admin_post_edit(request, pk):
+    """编辑文章"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    post = get_object_or_404(Post, pk=pk)
+    
+    if request.method == 'POST':
+        post.title = request.POST.get('title')
+        post.summary = request.POST.get('summary')
+        post.content = request.POST.get('content')
+        
+        category_id = request.POST.get('category')
+        post.category_id = category_id if category_id else None
+        
+        tag_ids = request.POST.getlist('tags')
+        post.tags.set(tag_ids)
+        
+        post.is_published = request.POST.get('is_published') == 'on'
+        post.is_featured = request.POST.get('is_featured') == 'on'
+        
+        cover_image = request.FILES.get('cover_image')
+        if cover_image:
+            post.cover_image = cover_image
+        
+        post.save()
+        messages.success(request, '文章更新成功')
+        return redirect('blog:admin_posts')
+    
+    categories = Category.objects.all()
+    tags = Tag.objects.all()
+    
+    context = {
+        'title': '编辑文章',
+        'post': post,
+        'categories': categories,
+        'tags': tags,
+    }
+    
+    return render(request, 'blog/admin/post_form.html', context)
+
+
+@login_required
+def admin_post_delete(request, pk):
+    """删除文章"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    post = get_object_or_404(Post, pk=pk)
+    
+    if request.method == 'POST':
+        post.delete()
+        messages.success(request, '文章删除成功')
+        return redirect('blog:admin_posts')
+    
+    context = {
+        'title': '删除文章',
+        'post': post,
+    }
+    
+    return render(request, 'blog/admin/post_delete.html', context)
+
+
+@login_required
+def admin_categories(request):
+    """分类管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        description = request.POST.get('description')
+        
+        if name:
+            Category.objects.create(name=name, description=description)
+            messages.success(request, '分类创建成功')
+        else:
+            messages.error(request, '分类名称不能为空')
+    
+    categories = Category.objects.annotate(post_count=Count('post')).order_by('-created_at')
+    
+    context = {
+        'title': '分类管理',
+        'categories': categories,
+    }
+    
+    return render(request, 'blog/admin/categories.html', context)
+
+
+@login_required
+def admin_tags(request):
+    """标签管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    if request.method == 'POST':
+        name = request.POST.get('name')
+        
+        if name:
+            Tag.objects.create(name=name)
+            messages.success(request, '标签创建成功')
+        else:
+            messages.error(request, '标签名称不能为空')
+    
+    tags = Tag.objects.annotate(post_count=Count('post')).order_by('-created_at')
+    
+    context = {
+        'title': '标签管理',
+        'tags': tags,
+    }
+    
+    return render(request, 'blog/admin/tags.html', context)
+
+
+@login_required
+def admin_comments(request):
+    """评论管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    comments = Comment.objects.all().select_related('user', 'post').order_by('-created_at')
+    
+    paginator = Paginator(comments, 20)
+    page_number = request.GET.get('page')
+    comments = paginator.get_page(page_number)
+    
+    context = {
+        'title': '评论管理',
+        'comments': comments,
+    }
+    
+    return render(request, 'blog/admin/comments.html', context)
+
+
+@login_required
+def admin_users(request):
+    """用户管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    users = User.objects.all().order_by('-date_joined')
+    
+    paginator = Paginator(users, 20)
+    page_number = request.GET.get('page')
+    users = paginator.get_page(page_number)
+    
+    context = {
+        'title': '用户管理',
+        'users': users,
+    }
+    
+    return render(request, 'blog/admin/users.html', context)
+
+
+@login_required
+def admin_settings(request):
+    """系统设置"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    if request.method == 'POST':
+        # 这里可以处理系统设置的保存
+        messages.success(request, '设置保存成功')
+    
+    context = {
+        'title': '系统设置',
+    }
+    
+    return render(request, 'blog/admin/settings.html', context)

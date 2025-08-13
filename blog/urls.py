@@ -33,4 +33,13 @@ urlpatterns = [
     
     # 管理员后台
     path('admin/dashboard/', views.admin_dashboard, name='admin_dashboard'),
+    path('admin/posts/', views.admin_posts, name='admin_posts'),
+    path('admin/post/add/', views.admin_post_add, name='admin_post_add'),
+    path('admin/post/edit/<int:pk>/', views.admin_post_edit, name='admin_post_edit'),
+    path('admin/post/delete/<int:pk>/', views.admin_post_delete, name='admin_post_delete'),
+    path('admin/categories/', views.admin_categories, name='admin_categories'),
+    path('admin/tags/', views.admin_tags, name='admin_tags'),
+    path('admin/comments/', views.admin_comments, name='admin_comments'),
+    path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/settings/', views.admin_settings, name='admin_settings'),
 ]
