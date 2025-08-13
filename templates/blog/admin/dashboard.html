@@ -153,9 +153,20 @@
                 <h6 class="m-0 font-weight-bold text-primary">文章发布统计</h6>
             </div>
             <div class="card-body">
-                <div class="chart-area">
-                    <canvas id="myAreaChart"></canvas>
-                </div>
+                {% if published_posts > 0 %}
+                    <div class="chart-area">
+                        <canvas id="myAreaChart"></canvas>
+                    </div>
+                {% else %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-chart-line fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">暂无文章数据</h5>
+                        <p class="text-muted">发布一些文章后，这里将显示统计图表</p>
+                        <a href="{% url 'blog:admin_post_add' %}" class="btn btn-primary">
+                            <i class="fas fa-plus me-2"></i>立即发布文章
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -166,9 +177,20 @@
                 <h6 class="m-0 font-weight-bold text-primary">分类统计</h6>
             </div>
             <div class="card-body">
-                <div class="chart-pie pt-4 pb-2">
-                    <canvas id="myPieChart"></canvas>
-                </div>
+                {% if categories_with_posts %}
+                    <div class="chart-pie pt-4 pb-2">
+                        <canvas id="myPieChart"></canvas>
+                    </div>
+                {% else %}
+                    <div class="text-center py-4">
+                        <i class="fas fa-chart-pie fa-3x text-muted mb-3"></i>
+                        <h6 class="text-muted">暂无分类数据</h6>
+                        <p class="text-muted">创建分类并发布文章后显示</p>
+                        <a href="{% url 'blog:admin_categories' %}" class="btn btn-outline-primary btn-sm">
+                            <i class="fas fa-folder me-1"></i>管理分类
+                        </a>
+                    </div>
+                {% endif %}
             </div>
         </div>
     </div>
@@ -178,102 +200,148 @@
 {% block extra_js %}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
-// 文章发布统计图表
+// 文章发布统计图表 - 只在有数据时初始化
+{% if published_posts > 0 %}
 var ctx = document.getElementById("myAreaChart");
-var myLineChart = new Chart(ctx, {
-  type: 'line',
-  data: {
-    labels: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
-    datasets: [{
-      label: "文章数量",
-      lineTension: 0.3,
-      backgroundColor: "rgba(78, 115, 223, 0.05)",
-      borderColor: "rgba(78, 115, 223, 1)",
-      pointRadius: 3,
-      pointBackgroundColor: "rgba(78, 115, 223, 1)",
-      pointBorderColor: "rgba(78, 115, 223, 1)",
-      pointHoverRadius: 3,
-      pointHoverBackgroundColor: "rgba(78, 115, 223, 1)",
-      pointHoverBorderColor: "rgba(78, 115, 223, 1)",
-      pointHitRadius: 10,
-      pointBorderWidth: 2,
-      data: [0, 1, 2, 1, 3, 2, 4, 3, 5, 4, 6, 5],
-    }],
-  },
-  options: {
-    maintainAspectRatio: false,
-    layout: {
-      padding: {
-        left: 10,
-        right: 25,
-        top: 25,
-        bottom: 0
-      }
+if (ctx) {
+  // 这里可以传入真实的统计数据
+  var monthlyData = [
+    {% for i in "123456789101112"|make_list %}
+      {{ monthly_posts|default:"0" }},
+    {% endfor %}
+  ];
+  
+  var myLineChart = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: ["1月", "2月", "3月", "4月", "5月", "6月", "7月", "8月", "9月", "10月", "11月", "12月"],
+      datasets: [{
+        label: "文章数量",
+        lineTension: 0.3,
+        backgroundColor: "rgba(59, 130, 246, 0.05)",
+        borderColor: "rgba(59, 130, 246, 1)",
+        pointRadius: 3,
+        pointBackgroundColor: "rgba(59, 130, 246, 1)",
+        pointBorderColor: "rgba(59, 130, 246, 1)",
+        pointHoverRadius: 5,
+        pointHoverBackgroundColor: "rgba(59, 130, 246, 1)",
+        pointHoverBorderColor: "rgba(59, 130, 246, 1)",
+        pointHitRadius: 10,
+        pointBorderWidth: 2,
+        data: monthlyData.length > 0 ? monthlyData : [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+      }],
     },
-    scales: {
-      x: {
-        grid: {
-          display: false,
-          drawBorder: false
-        },
-        ticks: {
-          maxTicksLimit: 7
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      layout: {
+        padding: {
+          left: 10,
+          right: 25,
+          top: 25,
+          bottom: 0
         }
       },
-      y: {
-        ticks: {
-          maxTicksLimit: 5,
-          padding: 10,
+      scales: {
+        x: {
+          grid: {
+            display: false,
+            drawBorder: false
+          },
+          ticks: {
+            maxTicksLimit: 12,
+            color: '#858796'
+          }
         },
-        grid: {
-          color: "rgb(234, 236, 244)",
-          zeroLineColor: "rgb(234, 236, 244)",
-          drawBorder: false,
-          borderDash: [2],
-          zeroLineBorderDash: [2]
+        y: {
+          ticks: {
+            maxTicksLimit: 5,
+            padding: 10,
+            color: '#858796',
+            beginAtZero: true
+          },
+          grid: {
+            color: "rgba(226, 232, 240, 0.5)",
+            drawBorder: false,
+            borderDash: [2]
+          }
         }
-      }
-    },
-    plugins: {
-      legend: {
-        display: false
+      },
+      plugins: {
+        legend: {
+          display: false
+        }
       }
     }
-  }
-});
+  });
+}
+{% endif %}
 
-// 分类统计饼图
+// 分类统计饼图 - 只在有数据时初始化
+{% if categories_with_posts %}
 var ctx2 = document.getElementById("myPieChart");
-var myPieChart = new Chart(ctx2, {
-  type: 'doughnut',
-  data: {
-    labels: ["技术", "生活", "随笔"],
-    datasets: [{
-      data: [55, 30, 15],
-      backgroundColor: ['#4e73df', '#1cc88a', '#36b9cc'],
-      hoverBackgroundColor: ['#2e59d9', '#17a673', '#2c9faf'],
-      hoverBorderColor: "rgba(234, 236, 244, 1)",
-    }],
-  },
-  options: {
-    maintainAspectRatio: false,
-    plugins: {
-      tooltip: {
-        backgroundColor: "rgb(255,255,255)",
-        bodyColor: "#858796",
-        borderColor: '#dddfeb',
-        borderWidth: 1,
-        xPadding: 15,
-        yPadding: 15,
-        displayColors: false,
-        caretPadding: 10,
-      },
-      legend: {
-        display: false
-      }
+if (ctx2) {
+  var categoryData = {
+    labels: [
+      {% for category in categories_with_posts %}
+        "{{ category.name }}",
+      {% endfor %}
+    ],
+    data: [
+      {% for category in categories_with_posts %}
+        {{ category.post_count }},
+      {% endfor %}
+    ]
+  };
+  
+  // 动态生成颜色
+  var colors = ['#3b82f6', '#10b981', '#06b6d4', '#f59e0b', '#ef4444', '#8b5cf6', '#ec4899'];
+  var backgroundColors = categoryData.labels.map((_, index) => colors[index % colors.length]);
+  
+  var myPieChart = new Chart(ctx2, {
+    type: 'doughnut',
+    data: {
+      labels: categoryData.labels,
+      datasets: [{
+        data: categoryData.data,
+        backgroundColor: backgroundColors,
+        hoverBackgroundColor: backgroundColors.map(color => color + 'CC'),
+        borderWidth: 2,
+        borderColor: '#ffffff'
+      }],
     },
-    cutout: 80,
-  },
-});
+    options: {
+      maintainAspectRatio: false,
+      responsive: true,
+      plugins: {
+        tooltip: {
+          backgroundColor: "rgb(255,255,255)",
+          bodyColor: "#475569",
+          titleColor: "#1e293b",
+          borderColor: '#e2e8f0',
+          borderWidth: 1,
+          cornerRadius: 8,
+          displayColors: true,
+          callbacks: {
+            label: function(context) {
+              return context.label + ': ' + context.parsed + ' 篇文章';
+            }
+          }
+        },
+        legend: {
+          display: true,
+          position: 'bottom',
+          labels: {
+            usePointStyle: true,
+            padding: 15,
+            color: '#475569'
+          }
+        }
+      },
+      cutout: '60%',
+    }
+  });
+}
+{% endif %}
 </script>
 {% endblock %}

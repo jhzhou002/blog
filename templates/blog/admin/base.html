@@ -196,19 +196,60 @@
     <script>
         // Toggle the side navigation
         $(document).ready(function() {
+            // Sidebar toggle functionality
             $("#sidebarToggle, #sidebarToggleTop").on('click', function() {
                 $("body").toggleClass("sidebar-toggled");
                 $(".sidebar").toggleClass("toggled");
                 if ($(".sidebar").hasClass("toggled")) {
                     $('.sidebar .collapse').collapse('hide');
-                };
+                }
+            });
+
+            // Handle collapsible menu items
+            $('.nav-link[data-bs-toggle="collapse"]').on('click', function(e) {
+                e.preventDefault();
+                
+                // Get the target collapse element
+                const target = $(this).attr('data-bs-target');
+                const $target = $(target);
+                
+                // Close other open collapses
+                $('.collapse.show').not($target).collapse('hide');
+                
+                // Toggle the current collapse
+                $target.collapse('toggle');
+                
+                // Update parent nav item active state
+                const $navItem = $(this).closest('.nav-item');
+                
+                $target.on('shown.bs.collapse', function() {
+                    $navItem.addClass('active');
+                });
+                
+                $target.on('hidden.bs.collapse', function() {
+                    // Only remove active if no child is active
+                    if (!$target.find('.collapse-item.active').length) {
+                        $navItem.removeClass('active');
+                    }
+                });
+            });
+
+            // Handle collapse item clicks
+            $('.collapse-item').on('click', function(e) {
+                // Remove active from all collapse items
+                $('.collapse-item').removeClass('active');
+                // Add active to clicked item
+                $(this).addClass('active');
+                
+                // Keep parent nav item active
+                $(this).closest('.nav-item').addClass('active');
             });
 
             // Close any open menu accordions when window is resized below 768px
             $(window).resize(function() {
                 if ($(window).width() < 768) {
                     $('.sidebar .collapse').collapse('hide');
-                };
+                }
                 
                 // 确保在大屏幕时侧边栏显示
                 if ($(window).width() > 768) {
@@ -219,9 +260,24 @@
 
             // 设置当前页面的导航高亮
             var currentUrl = window.location.pathname;
+            
+            // Check direct nav links first
             $('.nav-link').each(function() {
                 if (this.getAttribute('href') === currentUrl) {
                     $(this).closest('.nav-item').addClass('active');
+                }
+            });
+            
+            // Check collapse items
+            $('.collapse-item').each(function() {
+                if (this.getAttribute('href') === currentUrl) {
+                    $(this).addClass('active');
+                    // Show parent collapse and mark parent nav item as active
+                    const $collapse = $(this).closest('.collapse');
+                    const $navItem = $(this).closest('.nav-item');
+                    
+                    $collapse.addClass('show');
+                    $navItem.addClass('active');
                 }
             });
         });

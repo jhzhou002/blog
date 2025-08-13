@@ -113,10 +113,11 @@ body {
 /* Collapse styles for submenus */
 .sidebar .collapse {
     background-color: rgba(248, 250, 252, 0.8);
+    border-top: 1px solid rgba(226, 232, 240, 0.5);
 }
 
 .sidebar .collapse .collapse-inner {
-    padding: 0;
+    padding: 0.5rem 0;
 }
 
 .sidebar .collapse .collapse-item {
@@ -126,12 +127,33 @@ body {
     text-decoration: none;
     font-size: 0.875rem;
     transition: all 0.2s ease;
+    border-left: 3px solid transparent;
 }
 
 .sidebar .collapse .collapse-item:hover {
     background-color: rgba(59, 130, 246, 0.05);
     color: #3b82f6;
-    padding-left: 3.5rem;
+    transform: translateX(4px);
+}
+
+.sidebar .collapse .collapse-item.active {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+    border-left-color: #3b82f6;
+    font-weight: 500;
+}
+
+/* Collapsed menu indicators */
+.nav-link[data-bs-toggle="collapse"]::after {
+    content: "\f107";
+    font-family: "Font Awesome 5 Free";
+    font-weight: 900;
+    float: right;
+    transition: transform 0.2s ease;
+}
+
+.nav-link[data-bs-toggle="collapse"][aria-expanded="true"]::after {
+    transform: rotate(180deg);
 }
 
 /* Content wrapper positioning */

@@ -364,7 +364,25 @@ def admin_dashboard(request):
     total_users = User.objects.count()
     
     # 最新评论
-    recent_comments = Comment.objects.order_by('-created_at')[:10]
+    recent_comments = Comment.objects.select_related('user', 'post').order_by('-created_at')[:10]
+    
+    # 有文章的分类统计
+    categories_with_posts = Category.objects.annotate(
+        post_count=Count('post', filter=Q(post__is_published=True))
+    ).filter(post_count__gt=0)[:6]  # 最多显示6个分类
+    
+    # 月度文章统计 (简化版本，实际项目中可能需要更复杂的查询)
+    from datetime import datetime
+    current_year = datetime.now().year
+    monthly_posts = []
+    
+    for month in range(1, 13):
+        count = Post.objects.filter(
+            created_at__year=current_year,
+            created_at__month=month,
+            is_published=True
+        ).count()
+        monthly_posts.append(count)
     
     context = {
         'title': '管理控制台',
@@ -373,6 +391,8 @@ def admin_dashboard(request):
         'total_comments': total_comments,
         'total_users': total_users,
         'recent_comments': recent_comments,
+        'categories_with_posts': categories_with_posts,
+        'monthly_posts': monthly_posts,
     }
     
     return render(request, 'blog/admin/dashboard.html', context)
