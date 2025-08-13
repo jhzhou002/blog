@@ -45,7 +45,7 @@ body {
 .hero-banner-section {
     position: relative;
     margin-bottom: 40px;
-    padding: 0 30px; /* 左右留边距 */
+    padding: 0 50px; /* 增加左右留边距 */
 }
 
 .hero-carousel {
@@ -53,6 +53,17 @@ body {
     border-radius: 20px; /* 圆角矩形 */
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    background-color: #f8f9fa; /* 防止底部白条显示 */
+}
+
+.hero-carousel .carousel-inner {
+    border-radius: 20px;
+    height: 100%;
+}
+
+.hero-carousel .carousel-item {
+    height: 400px;
+    border-radius: 20px;
 }
 
 .hero-banner {
@@ -62,6 +73,7 @@ body {
     position: relative;
     display: flex;
     align-items: center;
+    border-radius: 20px;
 }
 
 .hero-overlay {
@@ -117,25 +129,28 @@ body {
 }
 
 .carousel-indicators {
-    bottom: 30px;
+    bottom: 20px;
+    margin-bottom: 0; /* 确保没有底部外边距 */
 }
 
 .carousel-indicators button {
-    width: 12px;
-    height: 12px;
+    width: 10px;
+    height: 10px;
     border-radius: 50%;
-    margin: 0 5px;
-    background-color: rgba(255, 255, 255, 0.5);
-    border: 2px solid rgba(255, 255, 255, 0.8);
+    margin: 0 4px;
+    background-color: rgba(255, 255, 255, 0.6);
+    border: 1px solid rgba(255, 255, 255, 0.9);
+    opacity: 0.8;
 }
 
 .carousel-indicators button.active {
     background-color: white;
+    opacity: 1;
 }
 
 @media (max-width: 768px) {
     .hero-banner-section {
-        padding: 0 15px; /* 小屏幕减少边距 */
+        padding: 0 20px; /* 小屏幕也增加边距 */
     }
     
     .hero-carousel,
