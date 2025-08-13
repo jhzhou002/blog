@@ -1,5 +1,5 @@
 from django.shortcuts import render, get_object_or_404, redirect
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth import authenticate, login, logout, update_session_auth_hash
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.core.paginator import Paginator
@@ -9,6 +9,8 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.decorators.http import require_POST
 from django.conf import settings
 import json
+import os
+from PIL import Image
 
 from .models import Post, Category, Tag, Comment, User, UserAction, Banner
 
@@ -253,9 +255,6 @@ def logout_view(request):
 @login_required
 def profile(request):
     """个人中心"""
-    # 用户的评论
-    user_comments = Comment.objects.filter(user=request.user).order_by('-created_at')[:10]
-    
     # 用户的点赞文章
     liked_posts = Post.objects.filter(
         useraction__user=request.user,
@@ -272,12 +271,85 @@ def profile(request):
     
     context = {
         'title': '个人中心',
-        'user_comments': user_comments,
         'liked_posts': liked_posts,
         'favorited_posts': favorited_posts,
     }
     
     return render(request, 'blog/profile.html', context)
+
+
+@login_required
+def change_password(request):
+    """修改密码"""
+    if request.method == 'POST':
+        old_password = request.POST.get('old_password')
+        new_password1 = request.POST.get('new_password1')
+        new_password2 = request.POST.get('new_password2')
+        
+        # 验证当前密码
+        if not request.user.check_password(old_password):
+            messages.error(request, '当前密码错误')
+        elif new_password1 != new_password2:
+            messages.error(request, '两次新密码输入不一致')
+        elif len(new_password1) < 6:
+            messages.error(request, '密码长度不能少于6位')
+        else:
+            # 修改密码
+            request.user.set_password(new_password1)
+            request.user.save()
+            # 更新session，避免用户被登出
+            update_session_auth_hash(request, request.user)
+            messages.success(request, '密码修改成功')
+    
+    return redirect('blog:profile')
+
+
+@login_required
+def upload_avatar(request):
+    """上传头像"""
+    if request.method == 'POST' and request.FILES.get('avatar'):
+        avatar_file = request.FILES['avatar']
+        
+        # 验证文件类型
+        if not avatar_file.content_type.startswith('image/'):
+            messages.error(request, '请上传图片文件')
+            return redirect('blog:profile')
+        
+        # 验证文件大小（2MB）
+        if avatar_file.size > 2 * 1024 * 1024:
+            messages.error(request, '文件大小不能超过2MB')
+            return redirect('blog:profile')
+        
+        try:
+            # 删除旧头像
+            if request.user.avatar:
+                old_avatar_path = request.user.avatar.path
+                if os.path.exists(old_avatar_path):
+                    os.remove(old_avatar_path)
+            
+            # 保存新头像
+            request.user.avatar = avatar_file
+            request.user.save()
+            
+            # 处理图片（缩放到合适大小）
+            if request.user.avatar:
+                avatar_path = request.user.avatar.path
+                with Image.open(avatar_path) as img:
+                    # 转换为RGB模式（如果是RGBA）
+                    if img.mode in ('RGBA', 'LA', 'P'):
+                        img = img.convert('RGB')
+                    
+                    # 缩放到200x200
+                    img.thumbnail((200, 200), Image.Resampling.LANCZOS)
+                    img.save(avatar_path, 'JPEG', quality=85)
+            
+            messages.success(request, '头像上传成功')
+        except Exception as e:
+            messages.error(request, f'头像上传失败：{str(e)}')
+    else:
+        messages.error(request, '请选择要上传的头像文件')
+    
+    return redirect('blog:profile')
 
 
 # AJAX 视图

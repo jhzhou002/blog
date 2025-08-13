@@ -25,6 +25,8 @@ urlpatterns = [
     path('register/', views.register, name='register'),
     path('logout/', views.logout_view, name='logout'),
     path('profile/', views.profile, name='profile'),
+    path('change-password/', views.change_password, name='change_password'),
+    path('upload-avatar/', views.upload_avatar, name='upload_avatar'),
     
     # AJAX 接口
     path('post/<int:pk>/like/', views.like_post, name='like_post'),

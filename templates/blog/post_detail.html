@@ -96,7 +96,7 @@
 
             <!-- Comments Section -->
             <section class="comments-section mt-5">
-                <h4>评论 ({{ comments.count }})</h4>
+                <h4>评论 ({{ post.comments.count }})</h4>
                 
                 {% if user.is_authenticated %}
                 <!-- Add Comment Form -->
@@ -157,19 +157,25 @@
                         <!-- Child Comments -->
                         {% for reply in comment.replies.all %}
                         <div class="comment reply ms-5 mt-3">
-                            <div class="d-flex">
-                                <div class="comment-avatar me-3">
+                            <div class="d-flex {% if reply.user == comment.user %}flex-row-reverse{% endif %}">
+                                <div class="comment-avatar {% if reply.user == comment.user %}ms-3{% else %}me-3{% endif %}">
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
-                                        <i class="fas fa-user text-muted"></i>
+                                        {% if reply.user.avatar %}
+                                            <img src="{{ reply.user.avatar.url }}" class="rounded-circle" width="32" height="32" alt="{{ reply.user.username }}">
+                                        {% else %}
+                                            <i class="fas fa-user text-muted"></i>
+                                        {% endif %}
                                     </div>
                                 </div>
-                                <div class="comment-content flex-grow-1">
-                                    <div class="comment-header">
-                                        <strong>{{ reply.user.username }}</strong>
-                                        <small class="text-muted ms-2">{{ reply.created_at|date:"Y-m-d H:i" }}</small>
-                                    </div>
-                                    <div class="comment-body">
-                                        {{ reply.content|linebreaks }}
+                                <div class="comment-content flex-grow-1 {% if reply.user == comment.user %}text-end{% endif %}">
+                                    <div class="comment-bubble {% if reply.user == comment.user %}reply-bubble-right{% else %}reply-bubble-left{% endif %}">
+                                        <div class="comment-header">
+                                            <strong>{{ reply.user.username }}</strong>
+                                            <small class="text-muted ms-2">{{ reply.created_at|date:"Y-m-d H:i" }}</small>
+                                        </div>
+                                        <div class="comment-body">
+                                            {{ reply.content|linebreaks }}
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -238,9 +244,18 @@
     </div>
 </div>
 
+{% endblock %}
+
+{% block extra_js %}
 <script>
+const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
+
 function likePost(postId) {
-    {% if user.is_authenticated %}
+    if (!isAuthenticated) {
+        window.location.href = '{% url "blog:login" %}';
+        return;
+    }
+    
     fetch(`/post/${postId}/like/`, {
         method: 'POST',
         headers: {
@@ -254,13 +269,14 @@ function likePost(postId) {
             document.getElementById('like-count').textContent = data.count;
         }
     });
-    {% else %}
-    window.location.href = '{% url "blog:login" %}';
-    {% endif %}
 }
 
 function favoritePost(postId) {
-    {% if user.is_authenticated %}
+    if (!isAuthenticated) {
+        window.location.href = '{% url "blog:login" %}';
+        return;
+    }
+    
     fetch(`/post/${postId}/favorite/`, {
         method: 'POST',
         headers: {
@@ -274,9 +290,6 @@ function favoritePost(postId) {
             document.getElementById('favorite-count').textContent = data.count;
         }
     });
-    {% else %}
-    window.location.href = '{% url "blog:login" %}';
-    {% endif %}
 }
 
 function replyComment(commentId) {

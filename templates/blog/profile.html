@@ -52,25 +52,46 @@
                 </div>
             </div>
             
-            <!-- 我的评论 -->
+            <!-- 修改密码 -->
             <div class="card shadow-custom mb-4">
                 <div class="card-header">
-                    <h5 class="mb-0"><i class="fas fa-comments me-2"></i>我的评论</h5>
+                    <h5 class="mb-0"><i class="fas fa-key me-2"></i>修改密码</h5>
                 </div>
                 <div class="card-body">
-                    {% for comment in user_comments %}
-                        <div class="comment-card">
-                            <div class="comment-author">
-                                <a href="{{ comment.post.get_absolute_url }}" class="text-decoration-none">
-                                    {{ comment.post.title }}
-                                </a>
-                            </div>
-                            <div class="comment-date">{{ comment.created_at|date:"Y-m-d H:i" }}</div>
-                            <div class="comment-content">{{ comment.content }}</div>
+                    <form method="post" action="{% url 'blog:change_password' %}">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="old_password" class="form-label">当前密码</label>
+                            <input type="password" class="form-control" id="old_password" name="old_password" required>
                         </div>
-                    {% empty %}
-                        <p class="text-muted">暂无评论</p>
-                    {% endfor %}
+                        <div class="mb-3">
+                            <label for="new_password1" class="form-label">新密码</label>
+                            <input type="password" class="form-control" id="new_password1" name="new_password1" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="new_password2" class="form-label">确认新密码</label>
+                            <input type="password" class="form-control" id="new_password2" name="new_password2" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">修改密码</button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- 上传头像 -->
+            <div class="card shadow-custom mb-4">
+                <div class="card-header">
+                    <h5 class="mb-0"><i class="fas fa-image me-2"></i>上传头像</h5>
+                </div>
+                <div class="card-body">
+                    <form method="post" action="{% url 'blog:upload_avatar' %}" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="mb-3">
+                            <label for="avatar" class="form-label">选择头像</label>
+                            <input type="file" class="form-control" id="avatar" name="avatar" accept="image/*" required>
+                            <small class="form-text text-muted">支持JPG、PNG格式，大小不超过2MB</small>
+                        </div>
+                        <button type="submit" class="btn btn-primary">上传头像</button>
+                    </form>
                 </div>
             </div>
         </div>
