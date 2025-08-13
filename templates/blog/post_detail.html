@@ -120,7 +120,11 @@
                         <div class="d-flex">
                             <div class="comment-avatar me-3">
                                 <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
-                                    <i class="fas fa-user text-muted"></i>
+                                    {% if comment.user.avatar %}
+                                        <img src="{{ comment.user.avatar }}" class="rounded-circle" width="40" height="40" alt="{{ comment.user.username }}">
+                                    {% else %}
+                                        <i class="fas fa-user text-muted"></i>
+                                    {% endif %}
                                 </div>
                             </div>
                             <div class="comment-content flex-grow-1">
@@ -131,11 +135,17 @@
                                 <div class="comment-body">
                                     {{ comment.content|linebreaks }}
                                 </div>
-                                {% if user.is_authenticated %}
                                 <div class="comment-actions">
-                                    <button class="btn btn-sm btn-outline-primary" onclick="replyComment({{ comment.id }})">回复</button>
+                                    {% if user.is_authenticated %}
+                                        <button class="btn btn-sm btn-outline-primary" onclick="replyComment({{ comment.id }})">回复</button>
+                                    {% endif %}
+                                    {% if comment.replies.exists %}
+                                        <button class="btn btn-sm btn-link text-muted" onclick="toggleReplies({{ comment.id }})">
+                                            <span id="toggle-text-{{ comment.id }}">展开回复 ({{ comment.replies.count }})</span>
+                                            <i id="toggle-icon-{{ comment.id }}" class="fas fa-chevron-down"></i>
+                                        </button>
+                                    {% endif %}
                                 </div>
-                                {% endif %}
                             </div>
                         </div>
                         
@@ -155,6 +165,7 @@
                         {% endif %}
                         
                         <!-- Child Comments -->
+                        <div id="replies-{{ comment.id }}" class="replies-container" style="display: none;">
                         {% for reply in comment.replies.all %}
                         <div class="comment reply ms-5 mt-3">
                             <div class="d-flex {% if reply.user == comment.user %}flex-row-reverse{% endif %}">
@@ -181,6 +192,7 @@
                             </div>
                         </div>
                         {% endfor %}
+                        </div>
                     </div>
                     {% empty %}
                     <div class="text-center py-4">
@@ -298,6 +310,23 @@ function replyComment(commentId) {
 
 function cancelReply(commentId) {
     document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+}
+
+function toggleReplies(commentId) {
+    const repliesContainer = document.getElementById(`replies-${commentId}`);
+    const toggleText = document.getElementById(`toggle-text-${commentId}`);
+    const toggleIcon = document.getElementById(`toggle-icon-${commentId}`);
+    
+    if (repliesContainer.style.display === 'none') {
+        repliesContainer.style.display = 'block';
+        toggleText.textContent = '收起回复';
+        toggleIcon.className = 'fas fa-chevron-up';
+    } else {
+        repliesContainer.style.display = 'none';
+        const replyCount = repliesContainer.querySelectorAll('.comment.reply').length;
+        toggleText.textContent = `展开回复 (${replyCount})`;
+        toggleIcon.className = 'fas fa-chevron-down';
+    }
 }
 
 function getCookie(name) {

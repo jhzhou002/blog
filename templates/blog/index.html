@@ -13,15 +13,6 @@
                 {% for banner in banners %}
                 <div class="carousel-item {% if forloop.first %}active{% endif %}">
                     <div class="hero-banner" style="background-image: url('{{ banner.image.url }}');">
-                        <div class="hero-overlay"></div>
-                        <div class="hero-content">
-                            <div class="text-center">
-                                <h1 class="hero-title">{{ banner.title }}</h1>
-                                {% if banner.subtitle %}
-                                    <p class="hero-subtitle">{{ banner.subtitle }}</p>
-                                {% endif %}
-                            </div>
-                        </div>
                     </div>
                 </div>
                 {% endfor %}
