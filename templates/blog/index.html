@@ -69,33 +69,6 @@
     <div class="row">
         <!-- Main Content -->
         <div class="col-lg-8">
-            <!-- Featured Carousel -->
-            {% if featured_posts %}
-            <div id="featuredCarousel" class="carousel slide rounded-carousel mb-5" data-bs-ride="carousel">
-                <div class="carousel-inner">
-                    {% for post in featured_posts %}
-                    <div class="carousel-item {% if forloop.first %}active{% endif %}">
-                        {% if post.cover_image %}
-                            <img src="{{ post.cover_image.url }}" class="d-block w-100 rounded-carousel-img" alt="{{ post.title }}">
-                        {% else %}
-                            <img src="{% static 'images/default-post.jpg' %}" class="d-block w-100 rounded-carousel-img" alt="{{ post.title }}">
-                        {% endif %}
-                        <div class="carousel-caption rounded">
-                            <h5><a href="{{ post.get_absolute_url }}" class="text-white text-decoration-none">{{ post.title }}</a></h5>
-                            <p>{{ post.summary|truncatewords:15 }}</p>
-                        </div>
-                    </div>
-                    {% endfor %}
-                </div>
-                <button class="carousel-control-prev" type="button" data-bs-target="#featuredCarousel" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon"></span>
-                </button>
-                <button class="carousel-control-next" type="button" data-bs-target="#featuredCarousel" data-bs-slide="next">
-                    <span class="carousel-control-next-icon"></span>
-                </button>
-            </div>
-            {% endif %}
-            
             <!-- Blog Posts -->
             <div class="posts-section">
                 {% for post in posts %}

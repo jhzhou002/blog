@@ -18,10 +18,7 @@ def index(request):
     # 轮播图横幅
     banners = Banner.objects.filter(is_active=True)[:5]
     
-    # 推荐文章（轮播图）- 现在改用banners，不再需要featured_posts
-    featured_posts = Post.objects.filter(is_published=True, is_featured=True)[:3]
-    
-    # 获取已发布的文章，现在显示所有已发布的文章
+    # 获取已发布的文章
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
     
     # 分页
@@ -44,7 +41,6 @@ def index(request):
     context = {
         'banners': banners,
         'posts': posts,
-        'featured_posts': featured_posts,
         'recent_posts': recent_posts,
         'recommended_posts': recommended_posts,
         'categories': categories,
