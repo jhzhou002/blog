@@ -1,0 +1,348 @@
+{% extends 'blog/admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_actions %}
+<button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addModal">
+    <i class="fas fa-plus me-2"></i>添加横幅
+</button>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">横幅管理</h6>
+    </div>
+    <div class="card-body">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+        
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th width="8%">排序</th>
+                        <th width="15%">横幅图片</th>
+                        <th width="20%">标题</th>
+                        <th width="15%">关联内容</th>
+                        <th width="10%">状态</th>
+                        <th width="12%">创建时间</th>
+                        <th width="20%">操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for banner in banners %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-secondary">{{ banner.order }}</span>
+                        </td>
+                        <td>
+                            <img src="{{ banner.image.url }}" alt="{{ banner.title }}" 
+                                 style="width: 100px; height: 60px; object-fit: cover; border-radius: 8px;">
+                        </td>
+                        <td>
+                            <div class="fw-bold">{{ banner.title }}</div>
+                            {% if banner.subtitle %}
+                                <small class="text-muted">{{ banner.subtitle|truncatechars:30 }}</small>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if banner.post %}
+                                <div>
+                                    <i class="fas fa-file-alt text-primary me-1"></i>
+                                    <a href="{{ banner.post.get_absolute_url }}" target="_blank" class="text-decoration-none">
+                                        {{ banner.post.title|truncatechars:20 }}
+                                    </a>
+                                </div>
+                            {% elif banner.external_url %}
+                                <div>
+                                    <i class="fas fa-external-link-alt text-info me-1"></i>
+                                    <a href="{{ banner.external_url }}" target="_blank" class="text-decoration-none">
+                                        外部链接
+                                    </a>
+                                </div>
+                            {% else %}
+                                <span class="text-muted">无链接</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if banner.is_active %}
+                                <span class="badge bg-success">启用</span>
+                            {% else %}
+                                <span class="badge bg-secondary">禁用</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <small>{{ banner.created_at|date:"Y-m-d H:i" }}</small>
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <button class="btn btn-sm btn-outline-primary" 
+                                        onclick="editBanner({{ banner.id }}, '{{ banner.title }}', '{{ banner.subtitle }}', '{{ banner.post_id|default:'' }}', '{{ banner.external_url }}', {{ banner.is_active|yesno:'true,false' }}, {{ banner.order }})">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-outline-danger" 
+                                        onclick="deleteBanner({{ banner.id }}, '{{ banner.title }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-center text-muted py-4">
+                            <i class="fas fa-image fa-3x mb-3"></i>
+                            <div>暂无横幅，请添加新横幅</div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- 预览区域 -->
+        {% if banners %}
+        <div class="mt-4">
+            <h6 class="text-muted">横幅预览：</h6>
+            <div id="bannerPreview" class="carousel slide" data-bs-ride="carousel" style="max-width: 600px; height: 200px;">
+                <div class="carousel-inner rounded">
+                    {% for banner in banners %}
+                        {% if banner.is_active %}
+                        <div class="carousel-item {% if forloop.first %}active{% endif %}">
+                            <img src="{{ banner.image.url }}" class="d-block w-100" alt="{{ banner.title }}" 
+                                 style="height: 200px; object-fit: cover;">
+                            <div class="carousel-caption">
+                                <h6 class="text-white">{{ banner.title }}</h6>
+                                {% if banner.subtitle %}
+                                    <small>{{ banner.subtitle|truncatechars:50 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#bannerPreview" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon"></span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#bannerPreview" data-bs-slide="next">
+                    <span class="carousel-control-next-icon"></span>
+                </button>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- 添加横幅模态框 -->
+<div class="modal fade" id="addModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">添加横幅</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="add">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="title" class="form-label">横幅标题 *</label>
+                                <input type="text" class="form-control" id="title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="subtitle" class="form-label">副标题</label>
+                                <input type="text" class="form-control" id="subtitle" name="subtitle">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="image" class="form-label">横幅图片 *</label>
+                                <input type="file" class="form-control" id="image" name="image" accept="image/*" required>
+                                <small class="form-text text-muted">推荐尺寸: 1920x500px</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="order" class="form-label">排序</label>
+                                <input type="number" class="form-control" id="order" name="order" value="0" min="0">
+                                <small class="form-text text-muted">数值越小越靠前</small>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="is_active" name="is_active" checked>
+                                    <label class="form-check-label" for="is_active">
+                                        启用横幅
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>链接设置 (选择其一)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="post" class="form-label">关联文章</label>
+                                <select class="form-control" id="post" name="post">
+                                    <option value="">请选择文章</option>
+                                    {% for post in posts %}
+                                        <option value="{{ post.id }}">{{ post.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="external_url" class="form-label">外部链接</label>
+                                <input type="url" class="form-control" id="external_url" name="external_url" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">添加横幅</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- 编辑横幅模态框 -->
+<div class="modal fade" id="editModal" tabindex="-1">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">编辑横幅</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form method="post" enctype="multipart/form-data">
+                {% csrf_token %}
+                <input type="hidden" name="action" value="edit">
+                <input type="hidden" name="banner_id" id="edit_banner_id">
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-3">
+                                <label for="edit_title" class="form-label">横幅标题 *</label>
+                                <input type="text" class="form-control" id="edit_title" name="title" required>
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="edit_subtitle" class="form-label">副标题</label>
+                                <input type="text" class="form-control" id="edit_subtitle" name="subtitle">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <label for="edit_image" class="form-label">横幅图片</label>
+                                <input type="file" class="form-control" id="edit_image" name="image" accept="image/*">
+                                <small class="form-text text-muted">留空则保持原图片不变</small>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="mb-3">
+                                <label for="edit_order" class="form-label">排序</label>
+                                <input type="number" class="form-control" id="edit_order" name="order" min="0">
+                            </div>
+                            
+                            <div class="mb-3">
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="edit_is_active" name="is_active">
+                                    <label class="form-check-label" for="edit_is_active">
+                                        启用横幅
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <h6>链接设置 (选择其一)</h6>
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="edit_post" class="form-label">关联文章</label>
+                                <select class="form-control" id="edit_post" name="post">
+                                    <option value="">请选择文章</option>
+                                    {% for post in posts %}
+                                        <option value="{{ post.id }}">{{ post.title }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="edit_external_url" class="form-label">外部链接</label>
+                                <input type="url" class="form-control" id="edit_external_url" name="external_url" placeholder="https://...">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">取消</button>
+                    <button type="submit" class="btn btn-primary">保存修改</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+function editBanner(id, title, subtitle, postId, externalUrl, isActive, order) {
+    document.getElementById('edit_banner_id').value = id;
+    document.getElementById('edit_title').value = title;
+    document.getElementById('edit_subtitle').value = subtitle;
+    document.getElementById('edit_post').value = postId || '';
+    document.getElementById('edit_external_url').value = externalUrl;
+    document.getElementById('edit_is_active').checked = isActive;
+    document.getElementById('edit_order').value = order;
+    
+    const modal = new bootstrap.Modal(document.getElementById('editModal'));
+    modal.show();
+}
+
+function deleteBanner(id, title) {
+    if (confirm(`确定要删除横幅"${title}"吗？`)) {
+        const form = document.createElement('form');
+        form.method = 'post';
+        form.innerHTML = `
+            <input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">
+            <input type="hidden" name="action" value="delete">
+            <input type="hidden" name="banner_id" value="${id}">
+        `;
+        document.body.appendChild(form);
+        form.submit();
+    }
+}
+
+// 防止同时选择文章和外部链接
+document.getElementById('post').addEventListener('change', function() {
+    if (this.value) {
+        document.getElementById('external_url').value = '';
+    }
+});
+
+document.getElementById('external_url').addEventListener('input', function() {
+    if (this.value) {
+        document.getElementById('post').value = '';
+    }
+});
+
+document.getElementById('edit_post').addEventListener('change', function() {
+    if (this.value) {
+        document.getElementById('edit_external_url').value = '';
+    }
+});
+
+document.getElementById('edit_external_url').addEventListener('input', function() {
+    if (this.value) {
+        document.getElementById('edit_post').value = '';
+    }
+});
+</script>
+{% endblock %}

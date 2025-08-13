@@ -1,0 +1,311 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ post.title }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8">
+            <article class="post-detail">
+                <!-- Post Header -->
+                <header class="post-header">
+                    {% if post.category %}
+                        <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                            {{ post.category.name }}
+                        </a>
+                    {% endif %}
+                    
+                    <h1 class="post-title">{{ post.title }}</h1>
+                    
+                    <div class="post-meta">
+                        <span><i class="far fa-clock"></i> {{ post.created_at|date:"Y年m月d日 H:i" }}</span>
+                        <span><i class="far fa-user"></i> {{ post.author.username }}</span>
+                        <span><i class="far fa-eye"></i> {{ post.views }}</span>
+                        <span><i class="far fa-heart"></i> {{ post.likes }}</span>
+                        <span><i class="far fa-star"></i> {{ post.favorites }}</span>
+                    </div>
+                    
+                    {% if post.cover_image %}
+                    <div class="post-cover">
+                        <img src="{{ post.cover_image.url }}" alt="{{ post.title }}" class="img-fluid rounded">
+                    </div>
+                    {% endif %}
+                </header>
+
+                <!-- Post Content -->
+                <div class="post-content">
+                    {% if post.summary %}
+                        <div class="post-summary">
+                            <p class="lead">{{ post.summary }}</p>
+                        </div>
+                    {% endif %}
+                    
+                    <div class="post-body">
+                        {{ post.content|linebreaks }}
+                    </div>
+                </div>
+
+                <!-- Post Tags -->
+                {% if post.tags.exists %}
+                <div class="post-tags mt-4">
+                    <h6>标签:</h6>
+                    {% for tag in post.tags.all %}
+                        <a href="{% url 'blog:tag_posts' tag.pk %}" class="tag"># {{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+                {% endif %}
+
+                <!-- Post Actions -->
+                <div class="post-actions">
+                    <div class="row">
+                        <div class="col-6">
+                            <button class="btn btn-outline-primary" onclick="likePost({{ post.pk }})">
+                                <i class="far fa-heart"></i> 
+                                <span id="like-text">{% if user_liked %}已点赞{% else %}点赞{% endif %}</span>
+                                (<span id="like-count">{{ post.likes }}</span>)
+                            </button>
+                        </div>
+                        <div class="col-6 text-end">
+                            <button class="btn btn-outline-warning" onclick="favoritePost({{ post.pk }})">
+                                <i class="far fa-star"></i> 
+                                <span id="favorite-text">{% if user_favorited %}已收藏{% else %}收藏{% endif %}</span>
+                                (<span id="favorite-count">{{ post.favorites }}</span>)
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </article>
+
+            <!-- Related Posts -->
+            {% if related_posts %}
+            <section class="related-posts mt-5">
+                <h4>相关文章</h4>
+                <div class="row">
+                    {% for related_post in related_posts %}
+                    <div class="col-md-6 mb-3">
+                        <div class="card">
+                            {% if related_post.cover_image %}
+                                <img src="{{ related_post.cover_image.url }}" class="card-img-top" alt="{{ related_post.title }}" style="height: 150px; object-fit: cover;">
+                            {% endif %}
+                            <div class="card-body">
+                                <h6><a href="{{ related_post.get_absolute_url }}" class="text-decoration-none">{{ related_post.title }}</a></h6>
+                                <small class="text-muted">{{ related_post.created_at|date:"Y-m-d" }}</small>
+                            </div>
+                        </div>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+            {% endif %}
+
+            <!-- Comments Section -->
+            <section class="comments-section mt-5">
+                <h4>评论 ({{ comments.count }})</h4>
+                
+                {% if user.is_authenticated %}
+                <!-- Add Comment Form -->
+                <form method="post" action="{% url 'blog:add_comment' post.pk %}" class="mb-4">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <textarea name="content" class="form-control" rows="4" placeholder="写下你的评论..." required></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary">发表评论</button>
+                </form>
+                {% else %}
+                <div class="alert alert-info">
+                    <a href="{% url 'blog:login' %}">登录</a> 后才能发表评论
+                </div>
+                {% endif %}
+
+                <!-- Comments List -->
+                <div class="comments-list">
+                    {% for comment in comments %}
+                    <div class="comment">
+                        <div class="d-flex">
+                            <div class="comment-avatar me-3">
+                                <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                    <i class="fas fa-user text-muted"></i>
+                                </div>
+                            </div>
+                            <div class="comment-content flex-grow-1">
+                                <div class="comment-header">
+                                    <strong>{{ comment.user.username }}</strong>
+                                    <small class="text-muted ms-2">{{ comment.created_at|date:"Y-m-d H:i" }}</small>
+                                </div>
+                                <div class="comment-body">
+                                    {{ comment.content|linebreaks }}
+                                </div>
+                                {% if user.is_authenticated %}
+                                <div class="comment-actions">
+                                    <button class="btn btn-sm btn-outline-primary" onclick="replyComment({{ comment.id }})">回复</button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- Reply Form (hidden by default) -->
+                        {% if user.is_authenticated %}
+                        <div id="reply-form-{{ comment.id }}" class="reply-form mt-3" style="display: none;">
+                            <form method="post" action="{% url 'blog:add_comment' post.pk %}">
+                                {% csrf_token %}
+                                <input type="hidden" name="parent_id" value="{{ comment.id }}">
+                                <div class="mb-3">
+                                    <textarea name="content" class="form-control" rows="3" placeholder="回复 {{ comment.user.username }}..." required></textarea>
+                                </div>
+                                <button type="submit" class="btn btn-sm btn-primary">发表回复</button>
+                                <button type="button" class="btn btn-sm btn-secondary ms-2" onclick="cancelReply({{ comment.id }})">取消</button>
+                            </form>
+                        </div>
+                        {% endif %}
+                        
+                        <!-- Child Comments -->
+                        {% for reply in comment.replies.all %}
+                        <div class="comment reply ms-5 mt-3">
+                            <div class="d-flex">
+                                <div class="comment-avatar me-3">
+                                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
+                                        <i class="fas fa-user text-muted"></i>
+                                    </div>
+                                </div>
+                                <div class="comment-content flex-grow-1">
+                                    <div class="comment-header">
+                                        <strong>{{ reply.user.username }}</strong>
+                                        <small class="text-muted ms-2">{{ reply.created_at|date:"Y-m-d H:i" }}</small>
+                                    </div>
+                                    <div class="comment-body">
+                                        {{ reply.content|linebreaks }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    {% empty %}
+                    <div class="text-center py-4">
+                        <i class="far fa-comment fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">暂无评论</h5>
+                        <p class="text-muted">成为第一个评论的人吧！</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </section>
+        </div>
+
+        <!-- Sidebar -->
+        <div class="col-lg-4">
+            <!-- Author Info -->
+            <div class="sidebar-card">
+                <h5>作者信息</h5>
+                <div class="d-flex align-items-center">
+                    <div class="rounded-circle bg-light d-flex align-items-center justify-content-center me-3" style="width: 60px; height: 60px;">
+                        <i class="fas fa-user text-muted"></i>
+                    </div>
+                    <div>
+                        <h6 class="mb-1">{{ post.author.username }}</h6>
+                        <p class="text-muted mb-0">{{ post.author.first_name }} {{ post.author.last_name }}</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Recent Posts -->
+            <div class="sidebar-card">
+                <h5>最近文章</h5>
+                {% for recent_post in recent_posts %}
+                <div class="recent-post">
+                    <a href="{{ recent_post.get_absolute_url }}" class="recent-post-title">{{ recent_post.title }}</a>
+                    <div class="recent-post-date">{{ recent_post.created_at|date:"Y-m-d" }}</div>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Categories -->
+            <div class="sidebar-card">
+                <h5>分类</h5>
+                {% for category in categories %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="{% url 'blog:category_posts' category.pk %}" class="text-decoration-none">{{ category.name }}</a>
+                    <span class="badge bg-secondary">{{ category.post_count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+
+            <!-- Tags -->
+            <div class="sidebar-card">
+                <h5>热门标签</h5>
+                <div class="tag-cloud">
+                    {% for tag in tags %}
+                        <a href="{% url 'blog:tag_posts' tag.pk %}" class="tag"># {{ tag.name }}</a>
+                    {% endfor %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+function likePost(postId) {
+    {% if user.is_authenticated %}
+    fetch(`/post/${postId}/like/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('like-text').textContent = data.liked ? '已点赞' : '点赞';
+            document.getElementById('like-count').textContent = data.count;
+        }
+    });
+    {% else %}
+    window.location.href = '{% url "blog:login" %}';
+    {% endif %}
+}
+
+function favoritePost(postId) {
+    {% if user.is_authenticated %}
+    fetch(`/post/${postId}/favorite/`, {
+        method: 'POST',
+        headers: {
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            document.getElementById('favorite-text').textContent = data.favorited ? '已收藏' : '收藏';
+            document.getElementById('favorite-count').textContent = data.count;
+        }
+    });
+    {% else %}
+    window.location.href = '{% url "blog:login" %}';
+    {% endif %}
+}
+
+function replyComment(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+}
+
+function cancelReply(commentId) {
+    document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %}

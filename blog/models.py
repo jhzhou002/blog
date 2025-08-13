@@ -124,3 +124,32 @@ class UserAction(models.Model):
     
     def __str__(self):
         return f'{self.user.username} {self.get_action_display()} {self.post.title}'
+
+
+class Banner(models.Model):
+    """轮播图横幅"""
+    title = models.CharField(max_length=200, verbose_name='横幅标题')
+    subtitle = models.CharField(max_length=300, blank=True, verbose_name='副标题')
+    image = models.ImageField(upload_to='banners/', verbose_name='横幅图片')
+    post = models.ForeignKey(Post, on_delete=models.CASCADE, null=True, blank=True, verbose_name='关联文章')
+    external_url = models.URLField(blank=True, verbose_name='外部链接')
+    is_active = models.BooleanField(default=True, verbose_name='是否启用')
+    order = models.PositiveIntegerField(default=0, verbose_name='排序')
+    created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
+    updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
+    
+    class Meta:
+        verbose_name = '轮播横幅'
+        verbose_name_plural = '轮播横幅'
+        ordering = ['order', '-created_at']
+    
+    def __str__(self):
+        return self.title
+    
+    def get_link_url(self):
+        """获取链接URL"""
+        if self.external_url:
+            return self.external_url
+        elif self.post:
+            return self.post.get_absolute_url()
+        return '#'

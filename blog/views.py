@@ -10,21 +10,25 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import json
 
-from .models import Post, Category, Tag, Comment, User, UserAction
+from .models import Post, Category, Tag, Comment, User, UserAction, Banner
 
 
 def index(request):
     """首页视图"""
-    # 获取已发布的文章
-    posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
+    # 轮播图横幅
+    banners = Banner.objects.filter(is_active=True)[:5]
+    
+    # 推荐文章（轮播图）
+    featured_posts = Post.objects.filter(is_published=True, is_featured=True)[:3]
+    
+    # 获取已发布的文章，排除已在轮播图中显示的推荐文章
+    featured_post_ids = [post.id for post in featured_posts]
+    posts = Post.objects.filter(is_published=True).exclude(id__in=featured_post_ids).select_related('category', 'author').prefetch_related('tags')
     
     # 分页
     paginator = Paginator(posts, 5)  # 每页5篇文章
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
-    
-    # 推荐文章（轮播图）
-    featured_posts = Post.objects.filter(is_published=True, is_featured=True)[:3]
     
     # 最近文章
     recent_posts = Post.objects.filter(is_published=True).order_by('-created_at')[:5]
@@ -39,6 +43,7 @@ def index(request):
     tags = Tag.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('-post_count')[:20]
     
     context = {
+        'banners': banners,
         'posts': posts,
         'featured_posts': featured_posts,
         'recent_posts': recent_posts,
@@ -627,6 +632,75 @@ def admin_users(request):
     }
     
     return render(request, 'blog/admin/users.html', context)
+
+
+@login_required
+def admin_banners(request):
+    """横幅管理"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        messages.error(request, '您没有权限访问此页面')
+        return redirect('blog:index')
+    
+    if request.method == 'POST':
+        action = request.POST.get('action')
+        
+        if action == 'add':
+            title = request.POST.get('title')
+            subtitle = request.POST.get('subtitle', '')
+            image = request.FILES.get('image')
+            post_id = request.POST.get('post')
+            external_url = request.POST.get('external_url', '')
+            is_active = request.POST.get('is_active') == 'on'
+            order = request.POST.get('order', 0)
+            
+            if title and image:
+                banner = Banner.objects.create(
+                    title=title,
+                    subtitle=subtitle,
+                    image=image,
+                    post_id=post_id if post_id else None,
+                    external_url=external_url,
+                    is_active=is_active,
+                    order=order
+                )
+                messages.success(request, '横幅创建成功')
+            else:
+                messages.error(request, '标题和图片不能为空')
+        
+        elif action == 'edit':
+            banner_id = request.POST.get('banner_id')
+            banner = get_object_or_404(Banner, id=banner_id)
+            
+            banner.title = request.POST.get('title')
+            banner.subtitle = request.POST.get('subtitle', '')
+            banner.post_id = request.POST.get('post') if request.POST.get('post') else None
+            banner.external_url = request.POST.get('external_url', '')
+            banner.is_active = request.POST.get('is_active') == 'on'
+            banner.order = request.POST.get('order', 0)
+            
+            new_image = request.FILES.get('image')
+            if new_image:
+                banner.image = new_image
+            
+            banner.save()
+            messages.success(request, '横幅更新成功')
+        
+        elif action == 'delete':
+            banner_id = request.POST.get('banner_id')
+            banner = get_object_or_404(Banner, id=banner_id)
+            banner.delete()
+            messages.success(request, '横幅删除成功')
+    
+    banners = Banner.objects.all().order_by('order', '-created_at')
+    posts = Post.objects.filter(is_published=True).order_by('-created_at')
+    
+    context = {
+        'title': '横幅管理',
+        'banners': banners,
+        'posts': posts,
+    }
+    
+    return render(request, 'blog/admin/banners.html', context)
 
 
 @login_required
