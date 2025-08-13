@@ -46,7 +46,34 @@ body {
     border-radius: 20px;
     overflow: hidden;
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
-    margin: 0 20px; /* 左右留白 */
+    margin: 0 30px; /* 增加左右留白 */
+    position: relative;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .rounded-carousel {
+        margin: 0 15px; /* 小屏幕减少边距 */
+        border-radius: 15px;
+    }
+    
+    .carousel-item {
+        height: 250px; /* 小屏幕降低高度 */
+    }
+    
+    .carousel-control-prev,
+    .carousel-control-next {
+        width: 40px;
+        height: 40px;
+    }
+    
+    .carousel-control-prev {
+        left: 8px;
+    }
+    
+    .carousel-control-next {
+        right: 8px;
+    }
 }
 
 .carousel-item {
@@ -74,7 +101,28 @@ body {
 
 .carousel-control-prev,
 .carousel-control-next {
-    width: 8%;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    top: 50%;
+    transform: translateY(-50%);
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.carousel-control-prev:hover,
+.carousel-control-next:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.carousel-control-prev {
+    left: 10px;
+}
+
+.carousel-control-next {
+    right: 10px;
 }
 
 .carousel-control-prev-icon,

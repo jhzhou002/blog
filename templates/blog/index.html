@@ -22,8 +22,8 @@
         <div class="col-lg-8">
             <!-- Featured Carousel -->
             {% if featured_posts %}
-            <div id="featuredCarousel" class="carousel slide mb-5" data-bs-ride="carousel">
-                <div class="carousel-inner rounded-carousel">
+            <div id="featuredCarousel" class="carousel slide rounded-carousel mb-5" data-bs-ride="carousel">
+                <div class="carousel-inner">
                     {% for post in featured_posts %}
                     <div class="carousel-item {% if forloop.first %}active{% endif %}">
                         {% if post.cover_image %}

@@ -26,7 +26,7 @@
                     {% endfor %}
                 {% endif %}
                 
-                <form method="post" enctype="multipart/form-data">
+                <form method="post" enctype="multipart/form-data" id="postForm">
                     {% csrf_token %}
                     <div class="mb-3">
                         <label for="title" class="form-label">标题 *</label>
@@ -78,7 +78,7 @@
                 <div class="mb-3">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
-                               {% if not post or post.is_published %}checked{% endif %}>
+                               form="postForm" {% if not post or post.is_published %}checked{% endif %}>
                         <label class="form-check-label" for="is_published">
                             发布文章
                         </label>
@@ -88,7 +88,7 @@
                 <div class="mb-3">
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
-                               {% if post.is_featured %}checked{% endif %}>
+                               form="postForm" {% if post.is_featured %}checked{% endif %}>
                         <label class="form-check-label" for="is_featured">
                             推荐文章
                         </label>
@@ -103,7 +103,7 @@
                 <h6 class="m-0 font-weight-bold text-primary">分类</h6>
             </div>
             <div class="card-body">
-                <select class="form-control" name="category">
+                <select class="form-control" name="category" form="postForm">
                     <option value="">请选择分类</option>
                     {% for category in categories %}
                         <option value="{{ category.id }}" 
@@ -124,7 +124,7 @@
                 {% for tag in tags %}
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" name="tags" value="{{ tag.id }}"
-                               id="tag_{{ tag.id }}"
+                               id="tag_{{ tag.id }}" form="postForm"
                                {% if post and tag in post.tags.all %}checked{% endif %}>
                         <label class="form-check-label" for="tag_{{ tag.id }}">
                             {{ tag.name }}
