@@ -1,0 +1,151 @@
+{% extends 'blog/admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'blog:admin_posts' %}" class="btn btn-secondary">
+    <i class="fas fa-arrow-left me-2"></i>返回列表
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="row">
+    <div class="col-lg-8">
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">{{ title }}</h6>
+            </div>
+            <div class="card-body">
+                {% if messages %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+                
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+                    <div class="mb-3">
+                        <label for="title" class="form-label">标题 *</label>
+                        <input type="text" class="form-control" id="title" name="title" 
+                               value="{% if post %}{{ post.title }}{% endif %}" required>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="summary" class="form-label">摘要</label>
+                        <textarea class="form-control" id="summary" name="summary" rows="3">{% if post %}{{ post.summary }}{% endif %}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="content" class="form-label">内容 *</label>
+                        <textarea class="form-control" id="content" name="content" rows="15" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                    </div>
+                    
+                    <div class="mb-3">
+                        <label for="cover_image" class="form-label">封面图片</label>
+                        <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
+                        {% if post.cover_image %}
+                            <div class="mt-2">
+                                <img src="{{ post.cover_image.url }}" alt="当前封面" style="max-width: 200px; height: auto;">
+                                <p class="small text-muted mt-1">当前封面图片</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6">
+                            <button type="submit" class="btn btn-primary">
+                                <i class="fas fa-save me-2"></i>保存文章
+                            </button>
+                            <button type="button" class="btn btn-secondary ms-2" onclick="history.back()">取消</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-lg-4">
+        <!-- 发布选项 -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">发布选项</h6>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
+                               {% if not post or post.is_published %}checked{% endif %}>
+                        <label class="form-check-label" for="is_published">
+                            发布文章
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                               {% if post.is_featured %}checked{% endif %}>
+                        <label class="form-check-label" for="is_featured">
+                            推荐文章
+                        </label>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 分类 -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">分类</h6>
+            </div>
+            <div class="card-body">
+                <select class="form-control" name="category">
+                    <option value="">请选择分类</option>
+                    {% for category in categories %}
+                        <option value="{{ category.id }}" 
+                                {% if post.category_id == category.id %}selected{% endif %}>
+                            {{ category.name }}
+                        </option>
+                    {% endfor %}
+                </select>
+            </div>
+        </div>
+        
+        <!-- 标签 -->
+        <div class="card shadow mb-4">
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">标签</h6>
+            </div>
+            <div class="card-body">
+                {% for tag in tags %}
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" name="tags" value="{{ tag.id }}"
+                               id="tag_{{ tag.id }}"
+                               {% if post and tag in post.tags.all %}checked{% endif %}>
+                        <label class="form-check-label" for="tag_{{ tag.id }}">
+                            {{ tag.name }}
+                        </label>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// 简单的表单验证
+document.querySelector('form').addEventListener('submit', function(e) {
+    const title = document.getElementById('title').value.trim();
+    const content = document.getElementById('content').value.trim();
+    
+    if (!title || !content) {
+        e.preventDefault();
+        alert('标题和内容不能为空');
+    }
+});
+</script>
+{% endblock %}

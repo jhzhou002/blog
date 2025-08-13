@@ -1,0 +1,123 @@
+{% extends 'blog/admin/base.html' %}
+{% load static %}
+
+{% block page_title %}{{ title }}{% endblock %}
+
+{% block page_actions %}
+<a href="{% url 'blog:admin_post_add' %}" class="btn btn-primary">
+    <i class="fas fa-plus me-2"></i>新建文章
+</a>
+{% endblock %}
+
+{% block admin_content %}
+<div class="card shadow mb-4">
+    <div class="card-header py-3">
+        <h6 class="m-0 font-weight-bold text-primary">文章列表</h6>
+    </div>
+    <div class="card-body">
+        <div class="table-responsive">
+            <table class="table table-bordered" width="100%" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>ID</th>
+                        <th>标题</th>
+                        <th>分类</th>
+                        <th>作者</th>
+                        <th>状态</th>
+                        <th>浏览数</th>
+                        <th>创建时间</th>
+                        <th>操作</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for post in posts %}
+                    <tr>
+                        <td>{{ post.id }}</td>
+                        <td>
+                            <a href="{{ post.get_absolute_url }}" target="_blank" class="text-decoration-none">
+                                {{ post.title|truncatechars:50 }}
+                            </a>
+                            {% if post.is_featured %}
+                                <span class="badge bg-warning ms-1">推荐</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if post.category %}
+                                <span class="badge bg-info">{{ post.category.name }}</span>
+                            {% else %}
+                                <span class="text-muted">未分类</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ post.author.username }}</td>
+                        <td>
+                            {% if post.is_published %}
+                                <span class="badge bg-success">已发布</span>
+                            {% else %}
+                                <span class="badge bg-secondary">草稿</span>
+                            {% endif %}
+                        </td>
+                        <td>{{ post.views }}</td>
+                        <td>{{ post.created_at|date:"Y-m-d" }}</td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{% url 'blog:admin_post_edit' post.pk %}" 
+                                   class="btn btn-sm btn-outline-primary">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'blog:admin_post_delete' post.pk %}" 
+                                   class="btn btn-sm btn-outline-danger">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="8" class="text-center text-muted py-4">
+                            暂无文章，<a href="{% url 'blog:admin_post_add' %}">立即创建</a>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        
+        <!-- Pagination -->
+        {% if posts.has_other_pages %}
+        <nav aria-label="Page navigation" class="mt-4">
+            <ul class="pagination justify-content-center">
+                {% if posts.has_previous %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page=1">首页</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.previous_page_number }}">上一页</a>
+                    </li>
+                {% endif %}
+                
+                {% for num in posts.paginator.page_range %}
+                    {% if posts.number == num %}
+                        <li class="page-item active">
+                            <span class="page-link">{{ num }}</span>
+                        </li>
+                    {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ num }}">{{ num }}</a>
+                        </li>
+                    {% endif %}
+                {% endfor %}
+                
+                {% if posts.has_next %}
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.next_page_number }}">下一页</a>
+                    </li>
+                    <li class="page-item">
+                        <a class="page-link" href="?page={{ posts.paginator.num_pages }}">尾页</a>
+                    </li>
+                {% endif %}
+            </ul>
+        </nav>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

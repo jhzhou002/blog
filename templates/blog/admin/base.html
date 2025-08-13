@@ -192,10 +192,10 @@
     <!-- Bootstrap 5 JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Custom scripts -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <script>
         // Toggle the side navigation
-        (function() {
-            'use strict';
+        $(document).ready(function() {
             $("#sidebarToggle, #sidebarToggleTop").on('click', function() {
                 $("body").toggleClass("sidebar-toggled");
                 $(".sidebar").toggleClass("toggled");
@@ -209,20 +209,23 @@
                 if ($(window).width() < 768) {
                     $('.sidebar .collapse').collapse('hide');
                 };
-            });
-
-            // Prevent the content wrapper from scrolling when the fixed side navigation hovered over
-            $('body.fixed-nav .sidebar').on('mousewheel DOMMouseScroll wheel', function(e) {
+                
+                // 确保在大屏幕时侧边栏显示
                 if ($(window).width() > 768) {
-                    var e0 = e.originalEvent,
-                        delta = e0.wheelDelta || -e0.detail;
-                    this.scrollTop += (delta < 0 ? 1 : -1) * 30;
-                    e.preventDefault();
+                    $("body").removeClass("sidebar-toggled");
+                    $(".sidebar").removeClass("toggled");
                 }
             });
-        })();
+
+            // 设置当前页面的导航高亮
+            var currentUrl = window.location.pathname;
+            $('.nav-link').each(function() {
+                if (this.getAttribute('href') === currentUrl) {
+                    $(this).closest('.nav-item').addClass('active');
+                }
+            });
+        });
     </script>
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     {% block extra_js %}{% endblock %}
 </body>
 </html>

@@ -192,6 +192,9 @@ def login_view(request):
         if user is not None:
             login(request, user)
             messages.success(request, '登录成功！')
+            # 管理员登录后直接跳转到后台管理
+            if user.is_admin or user.is_superuser:
+                return redirect('blog:admin_dashboard')
             return redirect(request.GET.get('next', 'blog:index'))
         else:
             messages.error(request, '用户名或密码错误')
