@@ -10,9 +10,11 @@ from django.views.decorators.http import require_POST
 from django.conf import settings
 import json
 import os
+import tempfile
 from PIL import Image
 
 from .models import Post, Category, Tag, Comment, User, UserAction, Banner
+from .utils import upload_avatar_to_qiniu
 
 
 def index(request):
@@ -321,29 +323,32 @@ def upload_avatar(request):
             return redirect('blog:profile')
         
         try:
-            # 删除旧头像
-            if request.user.avatar:
-                old_avatar_path = request.user.avatar.path
-                if os.path.exists(old_avatar_path):
-                    os.remove(old_avatar_path)
-            
-            # 保存新头像
-            request.user.avatar = avatar_file
-            request.user.save()
-            
-            # 处理图片（缩放到合适大小）
-            if request.user.avatar:
-                avatar_path = request.user.avatar.path
-                with Image.open(avatar_path) as img:
+            # 创建临时文件处理图片
+            with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
+                # 处理图片
+                with Image.open(avatar_file) as img:
                     # 转换为RGB模式（如果是RGBA）
                     if img.mode in ('RGBA', 'LA', 'P'):
                         img = img.convert('RGB')
                     
                     # 缩放到200x200
                     img.thumbnail((200, 200), Image.Resampling.LANCZOS)
-                    img.save(avatar_path, 'JPEG', quality=85)
-            
-            messages.success(request, '头像上传成功')
+                    img.save(temp_file.name, 'JPEG', quality=85)
+                
+                # 上传到七牛云
+                qiniu_url = upload_avatar_to_qiniu(temp_file.name, request.user.id)
+                
+                if qiniu_url:
+                    # 更新用户头像URL
+                    request.user.avatar = qiniu_url
+                    request.user.save()
+                    messages.success(request, '头像上传成功')
+                else:
+                    messages.error(request, '头像上传到云存储失败')
+                
+                # 删除临时文件
+                os.unlink(temp_file.name)
+                
         except Exception as e:
             messages.error(request, f'头像上传失败：{str(e)}')
     else:

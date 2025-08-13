@@ -161,7 +161,7 @@
                                 <div class="comment-avatar {% if reply.user == comment.user %}ms-3{% else %}me-3{% endif %}">
                                     <div class="rounded-circle bg-light d-flex align-items-center justify-content-center" style="width: 32px; height: 32px;">
                                         {% if reply.user.avatar %}
-                                            <img src="{{ reply.user.avatar.url }}" class="rounded-circle" width="32" height="32" alt="{{ reply.user.username }}">
+                                            <img src="{{ reply.user.avatar }}" class="rounded-circle" width="32" height="32" alt="{{ reply.user.username }}">
                                         {% else %}
                                             <i class="fas fa-user text-muted"></i>
                                         {% endif %}

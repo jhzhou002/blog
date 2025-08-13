@@ -8,7 +8,7 @@ from .utils import post_image_path, avatar_image_path
 class User(AbstractUser):
     """Extended User model"""
     is_admin = models.BooleanField(default=False, verbose_name='是否管理员')
-    avatar = models.ImageField(upload_to=avatar_image_path, blank=True, null=True, verbose_name='头像')
+    avatar = models.URLField(blank=True, null=True, verbose_name='头像URL')
     
     class Meta:
         verbose_name = '用户'
