@@ -55,21 +55,24 @@
         <div class="col-lg-8">
             <!-- Blog Posts -->
             <div class="posts-section">
-                <div class="row g-4">
-                    {% for post in posts %}
-                    <div class="col-md-6">
-                        <article class="post-card">
-                            <!-- 顶部封面图 -->
-                            <div class="post-card-img-wrapper">
-                                <a href="{{ post.get_absolute_url }}">
-                                    {% if post.cover_image %}
-                                        <img src="{{ post.cover_image }}" class="post-card-img" alt="{{ post.title }}">
-                                    {% else %}
-                                        <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
-                                    {% endif %}
-                                </a>
-                                <!-- 分类和VIP标识覆盖在图片上 -->
-                                <div class="post-card-overlay">
+                {% for post in posts %}
+                <article class="post-card">
+                    <div class="post-card-content">
+                        <!-- 左侧封面图 -->
+                        <div class="post-card-img-wrapper">
+                            <a href="{{ post.get_absolute_url }}">
+                                {% if post.cover_image %}
+                                    <img src="{{ post.cover_image }}" class="post-card-img" alt="{{ post.title }}">
+                                {% else %}
+                                    <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
+                                {% endif %}
+                            </a>
+                        </div>
+                        
+                        <!-- 右侧内容区 -->
+                        <div class="post-card-body">
+                            <div class="post-card-main">
+                                <div class="post-card-header">
                                     {% if post.category %}
                                         <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
                                             {{ post.category.name }}
@@ -79,52 +82,47 @@
                                         <span class="vip-badge">VIP</span>
                                     {% endif %}
                                 </div>
-                            </div>
-                            
-                            <!-- 内容区 -->
-                            <div class="post-card-body">
+                                
                                 <h3>
                                     <a href="{{ post.get_absolute_url }}" class="post-title">
                                         {{ post.title }}
                                     </a>
                                 </h3>
                                 
-                                <p class="post-summary">{{ post.summary|truncatechars:100 }}</p>
-                                
-                                <!-- 底部统计数据和标签 -->
-                                <div class="post-card-footer">
-                                    <div class="post-stats">
-                                        <span class="post-stat">
-                                            <i class="far fa-calendar-alt"></i>
-                                            {{ post.created_at|date:"Y.m.d" }}
-                                        </span>
-                                        <span class="post-stat">
-                                            <i class="far fa-eye"></i>
-                                            {{ post.views }} 阅读
-                                        </span>
-                                        <span class="post-stat">
-                                            <i class="far fa-heart"></i>
-                                            {{ post.likes }} 点赞
-                                        </span>
-                                        <span class="post-stat">
-                                            <i class="far fa-comment"></i>
-                                            {{ post.comments.count }} 评论
-                                        </span>
-                                    </div>
+                                <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
+                            </div>
+                            
+                            <!-- 底部统计数据 -->
+                            <div class="post-card-footer">
+                                <div class="post-stats">
+                                    <span class="post-stat">
+                                        <i class="far fa-eye"></i>
+                                        {{ post.views }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-heart"></i>
+                                        {{ post.likes }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-star"></i>
+                                        {{ post.favorites }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-comment"></i>
+                                        {{ post.comments.count }}
+                                    </span>
                                 </div>
                             </div>
-                        </article>
-                    </div>
-                    {% empty %}
-                    <div class="col-12">
-                        <div class="text-center py-5">
-                            <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
-                            <h4 class="text-muted">暂无文章</h4>
-                            <p class="text-muted">还没有发布任何文章</p>
                         </div>
                     </div>
-                    {% endfor %}
+                </article>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">暂无文章</h4>
+                    <p class="text-muted">还没有发布任何文章</p>
                 </div>
+                {% endfor %}
             </div>
             
             <!-- Pagination -->
