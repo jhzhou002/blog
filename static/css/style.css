@@ -196,7 +196,7 @@ body {
     transition: all 0.3s ease;
     overflow: hidden;
     margin-bottom: 25px;
-    min-height: 200px;
+    min-height: 180px;
     display: flex;
     flex-direction: column;
 }
@@ -214,8 +214,8 @@ body {
 
 .post-card-img-wrapper {
     flex-shrink: 0;
-    width: 200px;
-    height: 160px;
+    width: 180px;
+    height: 140px;
     overflow: hidden;
     display: flex;
     align-items: center;
@@ -239,7 +239,7 @@ body {
     flex-direction: column;
     justify-content: space-between;
     flex: 1;
-    min-height: 160px;
+    min-height: 140px;
 }
 
 .post-card-main {
@@ -248,15 +248,15 @@ body {
 
 .post-card-footer {
     border-top: 1px solid #f0f0f0;
-    padding-top: 15px;
-    margin-top: 15px;
+    padding-top: 10px;
+    margin-top: 10px;
 }
 
 .post-stats {
     display: flex;
     align-items: center;
-    gap: 20px;
-    font-size: 0.85rem;
+    gap: 15px;
+    font-size: 0.8rem;
     color: #666;
 }
 
@@ -271,13 +271,13 @@ body {
 }
 
 .post-title {
-    font-size: 1.4rem;
+    font-size: 1.3rem;
     font-weight: 600;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     color: var(--dark-color);
     text-decoration: none;
     line-height: 1.4;
-    min-height: 2.8rem;
+    min-height: 2.4rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -291,9 +291,9 @@ body {
 
 .post-summary {
     color: var(--secondary-color);
-    margin-bottom: 15px;
-    line-height: 1.5;
-    min-height: 3rem;
+    margin-bottom: 12px;
+    line-height: 1.4;
+    min-height: 2.8rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -851,10 +851,10 @@ body {
 .post-card-header {
     display: flex;
     align-items: center;
-    margin-bottom: 10px;
+    margin-bottom: 8px;
     flex-wrap: wrap;
     gap: 8px;
-    min-height: 24px;
+    min-height: 22px;
 }
 
 /* 移除VIP标题的特殊颜色和图标动画效果 */
