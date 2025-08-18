@@ -207,7 +207,7 @@ body {
 
 .post-card-content {
     display: flex;
-    align-items: stretch;
+    align-items: center;
     min-height: 140px;
 }
 
