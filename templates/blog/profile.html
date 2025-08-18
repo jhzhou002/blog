@@ -14,11 +14,11 @@
                 <div class="card-body">
                     <div class="row">
                         <div class="col-md-3 text-center mb-3">
-                            <div class="position-relative d-inline-block">
+                            <div class="position-relative d-inline-block avatar-upload-container" style="cursor: pointer;">
                                 {% if user.avatar %}
-                                    <img src="{{ user.avatar }}" class="rounded-circle mb-2 avatar-upload-btn" width="100" height="100" alt="头像" style="cursor: pointer;" onclick="console.log('Image clicked directly')">
+                                    <img src="{{ user.avatar }}" class="rounded-circle mb-2" width="100" height="100" alt="头像">
                                 {% else %}
-                                    <div class="bg-light rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center avatar-upload-btn" style="width: 100px; height: 100px; cursor: pointer;" onclick="console.log('Div clicked directly')">
+                                    <div class="bg-light rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
                                         <i class="fas fa-user fa-2x text-muted"></i>
                                     </div>
                                 {% endif %}
@@ -141,34 +141,41 @@
 document.addEventListener('DOMContentLoaded', function() {
     console.log('Profile page loaded, initializing avatar upload...');
     
-    const avatarUploadBtn = document.querySelector('.avatar-upload-btn');
+    const avatarContainer = document.querySelector('.avatar-upload-container');
     const avatarInput = document.getElementById('avatarInput');
     const avatarForm = document.getElementById('avatarUploadForm');
     
     console.log('Avatar elements found:', {
-        btn: !!avatarUploadBtn,
+        container: !!avatarContainer,
         input: !!avatarInput,
         form: !!avatarForm
     });
     
-    if (avatarUploadBtn && avatarInput && avatarForm) {
-        avatarUploadBtn.addEventListener('click', function(e) {
-            console.log('Avatar button clicked');
+    if (avatarContainer && avatarInput && avatarForm) {
+        avatarContainer.addEventListener('click', function(e) {
+            console.log('Avatar container clicked');
             e.preventDefault();
+            e.stopPropagation();
             avatarInput.click();
         });
         
         avatarInput.addEventListener('change', function(e) {
             console.log('File selected:', this.files);
             if (this.files && this.files[0]) {
-                console.log('Submitting form...');
+                const fileName = this.files[0].name;
+                const fileSize = (this.files[0].size / 1024 / 1024).toFixed(2);
+                console.log(`Uploading file: ${fileName} (${fileSize}MB)`);
                 avatarForm.submit();
             }
         });
         
-        console.log('Avatar upload event listeners added');
+        console.log('Avatar upload event listeners added to container');
     } else {
-        console.error('Avatar upload elements not found');
+        console.error('Avatar upload elements not found:', {
+            container: !!avatarContainer,
+            input: !!avatarInput,
+            form: !!avatarForm
+        });
     }
 });
 </script>

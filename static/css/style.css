@@ -1192,10 +1192,10 @@ body {
     opacity: 0;
     transition: opacity 0.3s ease;
     border-radius: 50%;
-    cursor: pointer;
+    pointer-events: none; /* 防止阻挡点击事件 */
 }
 
-.avatar-upload-btn:hover .avatar-overlay {
+.avatar-upload-container:hover .avatar-overlay {
     opacity: 1;
 }
 
