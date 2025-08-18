@@ -359,9 +359,14 @@ def upload_avatar(request):
 
 # AJAX 视图
 @require_POST
-@login_required
 def like_post(request, pk):
     """点赞文章"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': '请先登录'
+        })
+    
     post = get_object_or_404(Post, pk=pk)
     
     action, created = UserAction.objects.get_or_create(
@@ -388,9 +393,14 @@ def like_post(request, pk):
 
 
 @require_POST
-@login_required
 def favorite_post(request, pk):
     """收藏文章"""
+    if not request.user.is_authenticated:
+        return JsonResponse({
+            'success': False,
+            'message': '请先登录'
+        })
+    
     post = get_object_or_404(Post, pk=pk)
     
     action, created = UserAction.objects.get_or_create(

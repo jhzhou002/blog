@@ -165,7 +165,7 @@
                         {% endif %}
                         
                         <!-- Child Comments -->
-                        <div id="replies-{{ comment.id }}" class="replies-container" style="display: none;">
+                        <div id="replies-{{ comment.id }}" class="replies-container d-none">
                         {% for reply in comment.replies.all %}
                         <div class="comment reply ms-5 mt-3">
                             <div class="d-flex {% if reply.user == comment.user %}flex-row-reverse{% endif %}">
@@ -279,6 +279,8 @@ function likePost(postId) {
         if (data.success) {
             document.getElementById('like-text').textContent = data.liked ? '已点赞' : '点赞';
             document.getElementById('like-count').textContent = data.count;
+        } else {
+            window.location.href = '{% url "blog:login" %}';
         }
     });
 }
@@ -300,6 +302,8 @@ function favoritePost(postId) {
         if (data.success) {
             document.getElementById('favorite-text').textContent = data.favorited ? '已收藏' : '收藏';
             document.getElementById('favorite-count').textContent = data.count;
+        } else {
+            window.location.href = '{% url "blog:login" %}';
         }
     });
 }
@@ -317,12 +321,14 @@ function toggleReplies(commentId) {
     const toggleText = document.getElementById(`toggle-text-${commentId}`);
     const toggleIcon = document.getElementById(`toggle-icon-${commentId}`);
     
-    if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
-        repliesContainer.style.display = 'block';
+    if (repliesContainer.classList.contains('d-none')) {
+        repliesContainer.classList.remove('d-none');
+        repliesContainer.classList.add('d-block');
         toggleText.textContent = '收起回复';
         toggleIcon.className = 'fas fa-chevron-up';
     } else {
-        repliesContainer.style.display = 'none';
+        repliesContainer.classList.remove('d-block');
+        repliesContainer.classList.add('d-none');
         const replyCount = repliesContainer.querySelectorAll('.comment.reply').length;
         toggleText.textContent = `展开回复 (${replyCount})`;
         toggleIcon.className = 'fas fa-chevron-down';
