@@ -188,96 +188,95 @@ body {
 }
 
 
-/* Post Cards */
+/* Post Cards - 垂直布局设计 */
 .post-card {
     background: white;
-    border-radius: 15px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
+    border-radius: 16px;
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     overflow: hidden;
-    margin-bottom: 25px;
-    min-height: 180px;
+    height: 100%;
     display: flex;
     flex-direction: column;
+    border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .post-card:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-}
-
-.post-card-content {
-    display: flex;
-    flex: 1;
-    align-items: stretch;
+    transform: translateY(-4px);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12);
+    border-color: rgba(13, 110, 253, 0.1);
 }
 
 .post-card-img-wrapper {
-    flex-shrink: 0;
-    width: 180px;
-    height: 140px;
+    position: relative;
+    width: 100%;
+    height: 200px;
     overflow: hidden;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    background: #f8f9fa;
 }
 
 .post-card-img {
     width: 100%;
     height: 100%;
     object-fit: cover;
-    transition: transform 0.3s ease;
+    transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .post-card:hover .post-card-img {
-    transform: scale(1.05);
+    transform: scale(1.08);
+}
+
+.post-card-overlay {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    right: 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
 }
 
 .post-card-body {
     padding: 20px;
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    flex: 1;
-    min-height: 140px;
-}
-
-.post-card-main {
     flex: 1;
 }
 
 .post-card-footer {
-    border-top: 1px solid #f0f0f0;
-    padding-top: 10px;
-    margin-top: 10px;
+    margin-top: auto;
+    padding-top: 16px;
+    border-top: 1px solid rgba(0, 0, 0, 0.06);
 }
 
 .post-stats {
     display: flex;
     align-items: center;
-    gap: 15px;
-    font-size: 0.8rem;
-    color: #666;
+    gap: 16px;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+    color: #6b7280;
 }
 
 .post-stat {
     display: flex;
     align-items: center;
-    gap: 4px;
+    gap: 6px;
+    white-space: nowrap;
 }
 
 .post-stat i {
-    color: #999;
+    color: #9ca3af;
+    font-size: 0.8rem;
 }
 
 .post-title {
-    font-size: 1.3rem;
+    font-size: 1.25rem;
     font-weight: 600;
-    margin-bottom: 8px;
-    color: var(--dark-color);
+    margin-bottom: 12px;
+    color: #1f2937;
     text-decoration: none;
     line-height: 1.4;
-    min-height: 2.4rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -290,10 +289,10 @@ body {
 }
 
 .post-summary {
-    color: var(--secondary-color);
-    margin-bottom: 12px;
-    line-height: 1.4;
-    min-height: 2.8rem;
+    color: #6b7280;
+    margin-bottom: 0;
+    line-height: 1.6;
+    font-size: 0.9rem;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
@@ -563,20 +562,24 @@ body {
 
 /* Category Badge */
 .category-badge {
-    background: var(--primary-color);
+    background: rgba(13, 110, 253, 0.9);
     color: white;
-    padding: 5px 10px;
-    border-radius: 5px;
-    font-size: 0.8rem;
+    padding: 6px 12px;
+    border-radius: 8px;
+    font-size: 0.75rem;
+    font-weight: 500;
     text-decoration: none;
     display: inline-block;
-    margin-bottom: 10px;
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    transition: all 0.2s ease;
 }
 
 .category-badge:hover {
-    background: var(--dark-color);
+    background: rgba(13, 110, 253, 1);
     color: white;
     text-decoration: none;
+    transform: translateY(-1px);
 }
 
 /* Buttons */
@@ -779,18 +782,31 @@ body {
         font-size: 1rem;
     }
     
-    .post-card {
-        text-align: center;
+    /* 移动端博客卡片单列显示 */
+    .posts-section .row .col-md-6 {
+        max-width: 100%;
+        flex: 0 0 100%;
     }
     
-    .post-card-img {
-        width: 100%;
-        height: 200px;
+    .post-card-img-wrapper {
+        height: 180px;
     }
     
-    .post-meta {
+    .post-card-body {
+        padding: 16px;
+    }
+    
+    .post-title {
+        font-size: 1.1rem;
+    }
+    
+    .post-stats {
+        gap: 12px;
         justify-content: center;
-        flex-wrap: wrap;
+    }
+    
+    .post-stat {
+        font-size: 0.8rem;
     }
 }
 
@@ -798,6 +814,17 @@ body {
     /* Hide mobile bottom navigation on desktop */
     .mobile-bottom-nav {
         display: none !important;
+    }
+}
+
+@media (min-width: 992px) {
+    /* 桌面端调整博客卡片间距 */
+    .posts-section .row {
+        margin: -15px;
+    }
+    
+    .posts-section .row > div {
+        padding: 15px;
     }
 }
 

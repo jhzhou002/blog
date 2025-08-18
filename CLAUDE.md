@@ -48,6 +48,17 @@ python manage.py runserver
 python manage.py collectstatic
 ```
 
+### Dependencies Management
+```bash
+# Key dependencies (already in requirements.txt):
+# - Django>=4.2.0: Core framework
+# - Pillow>=9.0.0: Image processing for avatars
+# - PyMySQL>=1.0.0 & mysqlclient>=2.1.0: MySQL database connectors
+# - qiniu>=7.8.0: Qiniu Cloud file storage
+# - python-decouple>=3.6: Environment configuration
+# - gunicorn>=20.0.0: WSGI server for production
+```
+
 ## Code Architecture
 
 ### Django App Structure
