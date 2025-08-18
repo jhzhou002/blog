@@ -891,7 +891,7 @@ body {
 }
 
 .mobile-search-bar {
-    margin-bottom: 15px;
+    margin-bottom: 16px;
 }
 
 .mobile-search-input {
@@ -914,12 +914,14 @@ body {
 .mobile-filter-row-1 {
     display: flex;
     gap: 12px;
-    margin-bottom: 12px;
+    margin-bottom: 16px;
     justify-content: flex-start;
+    padding-bottom: 4px;
 }
 
 .mobile-filter-row-2 {
-    margin-bottom: 8px;
+    margin-bottom: 12px;
+    clear: both;
 }
 
 .category-tabs {

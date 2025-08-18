@@ -1,0 +1,225 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ category.name }} - {{ site_name }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <!-- Mobile Search and Filters (only visible on mobile) -->
+    <div class="mobile-search-filters d-md-none">
+        <div class="mobile-search-bar">
+            <form method="GET" action="{% url 'blog:search' %}" class="d-flex">
+                <input type="text" name="q" class="form-control mobile-search-input" placeholder="搜索文章..." value="{{ request.GET.q }}">
+                <button class="btn btn-primary mobile-search-btn" type="submit">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+        </div>
+        <!-- 第一行：全部/VIP文章切换 -->
+        <div class="mobile-filter-row-1">
+            <a href="{% url 'blog:index' %}" class="filter-tab primary-tab" data-filter="all">全部</a>
+            <a href="#" class="filter-tab primary-tab {% if request.GET.vip_only %}active{% endif %}" data-filter="vip">VIP文章</a>
+        </div>
+        
+        <!-- 第二行：分类筛选 -->
+        <div class="mobile-filter-row-2" id="categoryRow">
+            <div class="category-tabs" id="allCategories">
+                {% for cat in categories %}
+                    <a href="{% url 'blog:category_posts' cat.pk %}" class="filter-tab category-tab {% if cat.pk == category.pk %}active{% endif %}" data-category-id="{{ cat.pk }}">{{ cat.name }}</a>
+                {% endfor %}
+            </div>
+            <div class="category-tabs d-none" id="vipCategories">
+                {% for cat in categories %}
+                    <a href="{% url 'blog:category_posts' cat.pk %}?vip_only=1" class="filter-tab category-tab {% if cat.pk == category.pk and request.GET.vip_only %}active{% endif %}" data-category-id="{{ cat.pk }}">{{ cat.name }}</a>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Main Content -->
+        <div class="col-lg-8 col-md-12">
+            <!-- Page Header -->
+            <div class="page-header d-none d-md-block mb-4">
+                <h1 class="page-title">
+                    <i class="fas fa-folder me-2"></i>{{ category.name }}
+                    {% if request.GET.vip_only %}
+                        <span class="badge bg-warning text-dark ms-2">VIP</span>
+                    {% endif %}
+                </h1>
+                <p class="page-subtitle text-muted">{{ category.description|default:"该分类下的所有文章" }}</p>
+            </div>
+            
+            <!-- Blog Posts -->
+            <div class="posts-section">
+                {% for post in posts %}
+                <article class="post-card">
+                    <div class="post-card-content">
+                        <!-- 封面图 -->
+                        <div class="post-card-img-wrapper">
+                            <a href="{{ post.get_absolute_url }}">
+                                {% if post.cover_image %}
+                                    <img src="{{ post.cover_image }}" class="post-card-img" alt="{{ post.title }}">
+                                {% else %}
+                                    <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
+                                {% endif %}
+                            </a>
+                            <!-- 标签覆盖在图片上（移动端） -->
+                            <div class="post-card-header d-md-none">
+                                {% if post.category %}
+                                    <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                        {{ post.category.name }}
+                                    </a>
+                                {% endif %}
+                                {% if post.is_vip_only %}
+                                    <span class="vip-badge">VIP</span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- 内容区 -->
+                        <div class="post-card-body">
+                            <div class="post-card-main">
+                                <!-- 桌面端标签 -->
+                                <div class="post-card-header d-none d-md-block">
+                                    {% if post.category %}
+                                        <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                            {{ post.category.name }}
+                                        </a>
+                                    {% endif %}
+                                    {% if post.is_vip_only %}
+                                        <span class="vip-badge">VIP</span>
+                                    {% endif %}
+                                </div>
+                                
+                                <h3>
+                                    <a href="{{ post.get_absolute_url }}" class="post-title">
+                                        {{ post.title }}
+                                    </a>
+                                </h3>
+                                
+                                <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
+                            </div>
+                            
+                            <!-- 底部统计数据 -->
+                            <div class="post-card-footer">
+                                <div class="post-stats">
+                                    <span class="post-stat">
+                                        <i class="far fa-eye"></i>
+                                        {{ post.views }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-heart"></i>
+                                        {{ post.likes }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-star"></i>
+                                        {{ post.favorites }}
+                                    </span>
+                                    <span class="post-stat">
+                                        <i class="far fa-comment"></i>
+                                        {{ post.comments.count }}
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </article>
+                {% empty %}
+                <div class="text-center py-5">
+                    <i class="fas fa-file-alt fa-3x text-muted mb-3"></i>
+                    <h4 class="text-muted">暂无文章</h4>
+                    <p class="text-muted">该分类下还没有发布任何文章</p>
+                </div>
+                {% endfor %}
+            </div>
+            
+            <!-- Pagination -->
+            {% if posts.has_other_pages %}
+            <nav aria-label="Page navigation" class="mt-4">
+                <ul class="pagination justify-content-center">
+                    {% if posts.has_previous %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page=1{% if request.GET.vip_only %}&vip_only=1{% endif %}">首页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.previous_page_number }}{% if request.GET.vip_only %}&vip_only=1{% endif %}">上一页</a>
+                        </li>
+                    {% endif %}
+                    
+                    {% for num in posts.paginator.page_range %}
+                        {% if posts.number == num %}
+                            <li class="page-item active">
+                                <span class="page-link">{{ num }}</span>
+                            </li>
+                        {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ num }}{% if request.GET.vip_only %}&vip_only=1{% endif %}">{{ num }}</a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% if posts.has_next %}
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.next_page_number }}{% if request.GET.vip_only %}&vip_only=1{% endif %}">下一页</a>
+                        </li>
+                        <li class="page-item">
+                            <a class="page-link" href="?page={{ posts.paginator.num_pages }}{% if request.GET.vip_only %}&vip_only=1{% endif %}">尾页</a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </nav>
+            {% endif %}
+        </div>
+        
+        <!-- Sidebar (hidden on mobile) -->
+        <div class="col-lg-4 d-none d-lg-block">
+            <!-- Category Info -->
+            <div class="sidebar-card">
+                <h5><i class="fas fa-folder me-2"></i>分类信息</h5>
+                <h6>{{ category.name }}</h6>
+                <p class="text-muted">{{ category.description|default:"这是一个很棒的分类" }}</p>
+                <div class="d-flex justify-content-between">
+                    <span class="text-muted">文章数量</span>
+                    <span class="badge bg-primary">{{ posts.paginator.count }}</span>
+                </div>
+            </div>
+            
+            <!-- Recent Posts -->
+            <div class="sidebar-card">
+                <h5><i class="fas fa-clock me-2"></i>最近文章</h5>
+                {% for post in recent_posts %}
+                <div class="recent-post">
+                    <a href="{{ post.get_absolute_url }}" class="recent-post-title">{{ post.title }}</a>
+                    <div class="recent-post-date">{{ post.created_at|date:"m月d日" }}</div>
+                </div>
+                {% empty %}
+                <p class="text-muted">暂无文章</p>
+                {% endfor %}
+            </div>
+            
+            <!-- All Categories -->
+            {% if all_categories %}
+            <div class="sidebar-card">
+                <h5><i class="fas fa-folder me-2"></i>所有分类</h5>
+                {% for cat in all_categories %}
+                <div class="d-flex justify-content-between align-items-center mb-2">
+                    <a href="{% url 'blog:category_posts' cat.pk %}" class="text-decoration-none {% if cat.pk == category.pk %}text-primary fw-bold{% endif %}">
+                        {{ cat.name }}
+                    </a>
+                    <span class="badge bg-primary">{{ cat.post_count }}</span>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<script>
+// Initialize mobile filters for category page
+if (window.innerWidth <= 767) {
+    initMobileFilters();
+}
+</script>
+{% endblock %}
