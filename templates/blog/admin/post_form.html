@@ -49,7 +49,7 @@
                         <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
                         {% if post.cover_image %}
                             <div class="mt-2">
-                                <img src="{{ post.cover_image.url }}" alt="当前封面" style="max-width: 200px; height: auto;">
+                                <img src="{{ post.cover_image }}" alt="当前封面" style="max-width: 200px; height: auto;">
                                 <p class="small text-muted mt-1">当前封面图片</p>
                             </div>
                         {% endif %}

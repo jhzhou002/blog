@@ -14,7 +14,7 @@ import tempfile
 from PIL import Image
 
 from .models import Post, Category, Tag, Comment, User, UserAction, Banner
-from .utils import upload_avatar_to_qiniu
+from .utils import upload_avatar_to_qiniu, upload_post_image_to_qiniu
 
 
 def index(request):
@@ -527,6 +527,7 @@ def admin_post_add(request):
         cover_image = request.FILES.get('cover_image')
         
         if title and content:
+            # 先创建文章对象（不包含封面）
             post = Post.objects.create(
                 title=title,
                 summary=summary,
@@ -534,9 +535,30 @@ def admin_post_add(request):
                 category_id=category_id if category_id else None,
                 author=request.user,
                 is_published=is_published,
-                is_featured=is_featured,
-                cover_image=cover_image
+                is_featured=is_featured
             )
+            
+            # 处理封面图片上传到七牛云
+            if cover_image:
+                try:
+                    with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
+                        with Image.open(cover_image) as img:
+                            if img.mode in ('RGBA', 'LA', 'P'):
+                                img = img.convert('RGB')
+                            # 缩放封面图片到合适尺寸
+                            img.thumbnail((800, 600), Image.Resampling.LANCZOS)
+                            img.save(temp_file.name, 'JPEG', quality=85)
+                        
+                        # 上传到七牛云
+                        qiniu_url = upload_post_image_to_qiniu(temp_file.name, post.id)
+                        if qiniu_url:
+                            post.cover_image = qiniu_url
+                            post.save()
+                        
+                        # 删除临时文件
+                        os.unlink(temp_file.name)
+                except Exception as e:
+                    messages.warning(request, f'封面图片上传失败：{str(e)}')
             
             if tag_ids:
                 post.tags.set(tag_ids)
@@ -581,9 +603,27 @@ def admin_post_edit(request, pk):
         post.is_published = request.POST.get('is_published') == 'on'
         post.is_featured = request.POST.get('is_featured') == 'on'
         
+        # 处理封面图片上传到七牛云
         cover_image = request.FILES.get('cover_image')
         if cover_image:
-            post.cover_image = cover_image
+            try:
+                with tempfile.NamedTemporaryFile(delete=False, suffix='.jpg') as temp_file:
+                    with Image.open(cover_image) as img:
+                        if img.mode in ('RGBA', 'LA', 'P'):
+                            img = img.convert('RGB')
+                        # 缩放封面图片到合适尺寸
+                        img.thumbnail((800, 600), Image.Resampling.LANCZOS)
+                        img.save(temp_file.name, 'JPEG', quality=85)
+                    
+                    # 上传到七牛云
+                    qiniu_url = upload_post_image_to_qiniu(temp_file.name, post.id)
+                    if qiniu_url:
+                        post.cover_image = qiniu_url
+                    
+                    # 删除临时文件
+                    os.unlink(temp_file.name)
+            except Exception as e:
+                messages.warning(request, f'封面图片上传失败：{str(e)}')
         
         post.save()
         messages.success(request, '文章更新成功')

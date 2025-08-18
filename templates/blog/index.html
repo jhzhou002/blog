@@ -62,7 +62,7 @@
                         <div class="post-card-img-wrapper">
                             <a href="{{ post.get_absolute_url }}">
                                 {% if post.cover_image %}
-                                    <img src="{{ post.cover_image.url }}" class="post-card-img" alt="{{ post.title }}">
+                                    <img src="{{ post.cover_image }}" class="post-card-img" alt="{{ post.title }}">
                                 {% else %}
                                     <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
                                 {% endif %}

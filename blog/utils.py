@@ -59,6 +59,31 @@ def upload_avatar_to_qiniu(file_path, user_id):
         return None
 
 
+def upload_post_image_to_qiniu(file_path, post_id):
+    """
+    上传文章封面到七牛云
+    """
+    file_name = f"post_{post_id}_{uuid.uuid4().hex[:8]}.jpg"
+    
+    # 构造上传凭证
+    q = Auth(settings.QINIU_ACCESS_KEY, settings.QINIU_SECRET_KEY)
+    
+    # 上传到七牛后的文件名
+    key = f'blog-yk/images/{file_name}'
+    
+    # 生成上传Token
+    token = q.upload_token(settings.QINIU_BUCKET_NAME, key)
+    
+    # 要上传文件的本地路径
+    ret, info = put_file(token, key, file_path)
+    
+    if info.status_code == 200:
+        # 返回文件的访问URL
+        return f"http://{settings.QINIU_BUCKET_DOMAIN}/{key}"
+    else:
+        return None
+
+
 def generate_filename(instance, filename):
     """
     生成唯一的文件名
