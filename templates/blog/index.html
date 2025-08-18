@@ -77,7 +77,7 @@
                 {% for post in posts %}
                 <article class="post-card">
                     <div class="post-card-content">
-                        <!-- 左侧封面图 -->
+                        <!-- 封面图 -->
                         <div class="post-card-img-wrapper">
                             <a href="{{ post.get_absolute_url }}">
                                 {% if post.cover_image %}
@@ -86,12 +86,24 @@
                                     <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
                                 {% endif %}
                             </a>
+                            <!-- 标签覆盖在图片上（移动端） -->
+                            <div class="post-card-header d-md-none">
+                                {% if post.category %}
+                                    <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                        {{ post.category.name }}
+                                    </a>
+                                {% endif %}
+                                {% if post.is_vip_only %}
+                                    <span class="vip-badge">VIP</span>
+                                {% endif %}
+                            </div>
                         </div>
                         
-                        <!-- 右侧内容区 -->
+                        <!-- 内容区 -->
                         <div class="post-card-body">
                             <div class="post-card-main">
-                                <div class="post-card-header">
+                                <!-- 桌面端标签 -->
+                                <div class="post-card-header d-none d-md-block">
                                     {% if post.category %}
                                         <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
                                             {{ post.category.name }}
