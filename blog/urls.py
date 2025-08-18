@@ -43,6 +43,7 @@ urlpatterns = [
     path('admin/tags/', views.admin_tags, name='admin_tags'),
     path('admin/comments/', views.admin_comments, name='admin_comments'),
     path('admin/users/', views.admin_users, name='admin_users'),
+    path('admin/user/<int:user_id>/vip-toggle/', views.admin_user_vip_toggle, name='admin_user_vip_toggle'),
     path('admin/banners/', views.admin_banners, name='admin_banners'),
     path('admin/settings/', views.admin_settings, name='admin_settings'),
 ]

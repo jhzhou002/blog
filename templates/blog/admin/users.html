@@ -28,6 +28,7 @@
                         <th>用户信息</th>
                         <th>邮箱</th>
                         <th>角色</th>
+                        <th>VIP状态</th>
                         <th>状态</th>
                         <th>注册时间</th>
                         <th>最后登录</th>
@@ -72,6 +73,22 @@
                             {% endif %}
                         </td>
                         <td>
+                            {% if user.is_vip %}
+                                {% if user.vip_expire_date %}
+                                    <span class="badge bg-warning">
+                                        <i class="fas fa-crown me-1"></i>VIP
+                                        <small class="d-block">至 {{ user.vip_expire_date|date:"Y-m-d" }}</small>
+                                    </span>
+                                {% else %}
+                                    <span class="badge bg-success">
+                                        <i class="fas fa-crown me-1"></i>永久VIP
+                                    </span>
+                                {% endif %}
+                            {% else %}
+                                <span class="badge bg-secondary">普通用户</span>
+                            {% endif %}
+                        </td>
+                        <td>
                             {% if user.is_active %}
                                 <span class="badge bg-success">正常</span>
                             {% else %}
@@ -98,7 +115,16 @@
                                     <i class="fas fa-eye"></i>
                                 </button>
                                 {% if not user.is_superuser %}
-                                    <button class="btn btn-sm btn-outline-warning" 
+                                    <button class="btn btn-sm {% if user.is_vip %}btn-outline-danger{% else %}btn-outline-warning{% endif %}" 
+                                            onclick="toggleVipStatus({{ user.id }}, {{ user.is_vip|yesno:'true,false' }})"
+                                            title="{% if user.is_vip %}取消VIP{% else %}设为VIP{% endif %}">
+                                        {% if user.is_vip %}
+                                            <i class="fas fa-crown"></i>
+                                        {% else %}
+                                            <i class="far fa-crown"></i>
+                                        {% endif %}
+                                    </button>
+                                    <button class="btn btn-sm btn-outline-secondary" 
                                             onclick="toggleUserStatus({{ user.id }}, {{ user.is_active|yesno:'true,false' }})"
                                             title="{% if user.is_active %}禁用用户{% else %}启用用户{% endif %}">
                                         {% if user.is_active %}
@@ -268,6 +294,50 @@ function toggleUserStatus(userId, isActive) {
         `;
         document.body.appendChild(form);
         form.submit();
+    }
+}
+
+function toggleVipStatus(userId, isVip) {
+    const action = isVip ? '取消VIP' : '设为VIP';
+    
+    if (confirm(`确定要${action}这个用户吗？`)) {
+        const vipAction = isVip ? 'revoke_vip' : 'grant_vip';
+        
+        // 如果是设置VIP，询问是否设置过期时间
+        let expireDate = null;
+        if (!isVip) {
+            const setExpire = confirm('是否设置VIP过期时间？\n点击"确定"设置过期时间，点击"取消"设为永久VIP');
+            if (setExpire) {
+                expireDate = prompt('请输入VIP过期日期（格式：YYYY-MM-DD）：');
+                if (expireDate && !/^\d{4}-\d{2}-\d{2}$/.test(expireDate)) {
+                    alert('日期格式不正确，将设为永久VIP');
+                    expireDate = null;
+                }
+            }
+        }
+        
+        // 发送AJAX请求
+        fetch(`/admin/user/${userId}/vip-toggle/`, {
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': '{{ csrf_token }}',
+                'Content-Type': 'application/x-www-form-urlencoded',
+            },
+            body: `action=${vipAction}${expireDate ? `&expire_date=${expireDate}` : ''}`
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                alert(data.message);
+                location.reload(); // 刷新页面更新状态
+            } else {
+                alert('操作失败：' + data.message);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            alert('网络错误，请重试');
+        });
     }
 }
 

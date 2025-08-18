@@ -11,13 +11,33 @@
             <article class="post-detail">
                 <!-- Post Header -->
                 <header class="post-header">
-                    {% if post.category %}
-                        <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
-                            {{ post.category.name }}
-                        </a>
+                    {% if post.is_vip_only %}
+                        <div class="vip-post-header">
+                            <i class="fas fa-crown"></i>
+                            <strong>VIP专属文章</strong>
+                            <div><small>感谢您的VIP支持</small></div>
+                        </div>
                     {% endif %}
                     
-                    <h1 class="post-title">{{ post.title }}</h1>
+                    <div class="post-header-info">
+                        {% if post.category %}
+                            <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                {{ post.category.name }}
+                            </a>
+                        {% endif %}
+                        {% if post.is_vip_only %}
+                            <span class="vip-status-badge">
+                                <i class="fas fa-crown"></i> VIP专属
+                            </span>
+                        {% endif %}
+                    </div>
+                    
+                    <h1 class="post-title{% if post.is_vip_only %} vip-title{% endif %}">
+                        {{ post.title }}
+                        {% if post.is_vip_only %}
+                            <i class="fas fa-crown vip-icon"></i>
+                        {% endif %}
+                    </h1>
                     
                     <div class="post-meta">
                         <span><i class="far fa-clock"></i> {{ post.created_at|date:"Y年m月d日 H:i" }}</span>

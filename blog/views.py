@@ -28,6 +28,10 @@ def index(request):
     # 获取已发布的文章，支持分类筛选
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
     
+    # VIP文章访问控制：非VIP用户不显示VIP文章
+    if not request.user.is_authenticated or not request.user.is_vip_active():
+        posts = posts.filter(is_vip_only=False)
+    
     # 当前选中的分类
     current_category = None
     if category_id:
@@ -43,10 +47,16 @@ def index(request):
     posts = paginator.get_page(page_number)
     
     # 最近文章
-    recent_posts = Post.objects.filter(is_published=True).order_by('-created_at')[:5]
+    recent_posts = Post.objects.filter(is_published=True)
+    if not request.user.is_authenticated or not request.user.is_vip_active():
+        recent_posts = recent_posts.filter(is_vip_only=False)
+    recent_posts = recent_posts.order_by('-created_at')[:5]
     
     # 推荐阅读（按浏览量排序）
-    recommended_posts = Post.objects.filter(is_published=True).order_by('-views', '-likes')[:5]
+    recommended_posts = Post.objects.filter(is_published=True)
+    if not request.user.is_authenticated or not request.user.is_vip_active():
+        recommended_posts = recommended_posts.filter(is_vip_only=False)
+    recommended_posts = recommended_posts.order_by('-views', '-likes')[:5]
     
     # 分类统计
     categories = Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0)[:10]
@@ -73,17 +83,35 @@ def post_detail(request, pk):
     """文章详情页"""
     post = get_object_or_404(Post, pk=pk, is_published=True)
     
+    # VIP文章访问控制
+    if post.is_vip_only:
+        if not request.user.is_authenticated:
+            # 未登录用户直接跳转到VIP升级页面
+            return render(request, 'blog/vip_upgrade.html', {'post': post})
+        elif not request.user.is_vip_active():
+            # 非VIP用户或VIP已过期
+            return render(request, 'blog/vip_upgrade.html', {
+                'post': post, 
+                'user_logged_in': True
+            })
+    
     # 增加浏览量
     post.increment_views()
     
     # 获取评论
     comments = Comment.objects.filter(post=post, is_approved=True, parent=None).order_by('-created_at')
     
-    # 相关文章
+    # 相关文章（排除VIP文章，除非用户是VIP）
     related_posts = Post.objects.filter(
         category=post.category, 
         is_published=True
-    ).exclude(pk=post.pk)[:4]
+    ).exclude(pk=post.pk)
+    
+    # 如果用户不是VIP，过滤掉VIP文章
+    if not request.user.is_authenticated or not request.user.is_vip_active():
+        related_posts = related_posts.filter(is_vip_only=False)
+    
+    related_posts = related_posts[:4]
     
     # 检查用户是否已点赞/收藏
     user_liked = False
@@ -558,6 +586,7 @@ def admin_post_add(request):
         tag_ids = request.POST.getlist('tags')
         is_published = request.POST.get('is_published') == 'on'
         is_featured = request.POST.get('is_featured') == 'on'
+        is_vip_only = request.POST.get('is_vip_only') == 'on'
         cover_image = request.FILES.get('cover_image')
         
         if title and content:
@@ -569,7 +598,8 @@ def admin_post_add(request):
                 category_id=category_id if category_id else None,
                 author=request.user,
                 is_published=is_published,
-                is_featured=is_featured
+                is_featured=is_featured,
+                is_vip_only=is_vip_only
             )
             
             # 处理封面图片上传到七牛云
@@ -636,6 +666,7 @@ def admin_post_edit(request, pk):
         
         post.is_published = request.POST.get('is_published') == 'on'
         post.is_featured = request.POST.get('is_featured') == 'on'
+        post.is_vip_only = request.POST.get('is_vip_only') == 'on'
         
         # 处理封面图片上传到七牛云
         cover_image = request.FILES.get('cover_image')
@@ -791,6 +822,49 @@ def admin_users(request):
     }
     
     return render(request, 'blog/admin/users.html', context)
+
+
+@login_required
+def admin_user_vip_toggle(request, user_id):
+    """切换用户VIP状态"""
+    if not request.user.is_admin and not request.user.is_superuser:
+        return JsonResponse({'success': False, 'message': '权限不足'})
+    
+    if request.method == 'POST':
+        try:
+            user = get_object_or_404(User, id=user_id)
+            action = request.POST.get('action')
+            
+            if action == 'grant_vip':
+                user.is_vip = True
+                # 设置VIP过期时间（可选）
+                expire_date = request.POST.get('expire_date')
+                if expire_date:
+                    from datetime import datetime
+                    user.vip_expire_date = datetime.strptime(expire_date, '%Y-%m-%d')
+                else:
+                    user.vip_expire_date = None  # 永久VIP
+                user.save()
+                return JsonResponse({
+                    'success': True, 
+                    'message': f'已设置 {user.username} 为VIP用户',
+                    'is_vip': True
+                })
+            
+            elif action == 'revoke_vip':
+                user.is_vip = False
+                user.vip_expire_date = None
+                user.save()
+                return JsonResponse({
+                    'success': True, 
+                    'message': f'已取消 {user.username} 的VIP状态',
+                    'is_vip': False
+                })
+                
+        except Exception as e:
+            return JsonResponse({'success': False, 'message': str(e)})
+    
+    return JsonResponse({'success': False, 'message': '无效请求'})
 
 
 @login_required

@@ -94,6 +94,19 @@
                         </label>
                     </div>
                 </div>
+                
+                <div class="mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" id="is_vip_only" name="is_vip_only"
+                               form="postForm" {% if post.is_vip_only %}checked{% endif %}>
+                        <label class="form-check-label" for="is_vip_only">
+                            <i class="fas fa-crown text-warning me-1"></i>设为VIP文章
+                        </label>
+                        <div class="form-text">
+                            <small class="text-muted">仅VIP用户可以阅读此文章</small>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
         

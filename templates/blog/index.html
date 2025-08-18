@@ -56,7 +56,7 @@
             <!-- Blog Posts -->
             <div class="posts-section">
                 {% for post in posts %}
-                <article class="post-card">
+                <article class="post-card{% if post.is_vip_only %} vip-post-card{% endif %}">
                     <div class="post-card-content">
                         <!-- 左侧封面图 -->
                         <div class="post-card-img-wrapper">
@@ -72,13 +72,27 @@
                         <!-- 右侧内容区 -->
                         <div class="post-card-body">
                             <div class="post-card-main">
-                                {% if post.category %}
-                                    <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
-                                        {{ post.category.name }}
-                                    </a>
-                                {% endif %}
+                                <div class="post-card-header">
+                                    {% if post.category %}
+                                        <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                            {{ post.category.name }}
+                                        </a>
+                                    {% endif %}
+                                    {% if post.is_vip_only %}
+                                        <span class="vip-badge">
+                                            <i class="fas fa-crown"></i> VIP
+                                        </span>
+                                    {% endif %}
+                                </div>
                                 
-                                <h3><a href="{{ post.get_absolute_url }}" class="post-title">{{ post.title }}</a></h3>
+                                <h3>
+                                    <a href="{{ post.get_absolute_url }}" class="post-title{% if post.is_vip_only %} vip-title{% endif %}">
+                                        {{ post.title }}
+                                        {% if post.is_vip_only %}
+                                            <i class="fas fa-crown vip-icon"></i>
+                                        {% endif %}
+                                    </a>
+                                </h3>
                                 
                                 <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
                                 

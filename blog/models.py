@@ -9,10 +9,20 @@ class User(AbstractUser):
     """Extended User model"""
     is_admin = models.BooleanField(default=False, verbose_name='是否管理员')
     avatar = models.URLField(blank=True, null=True, verbose_name='头像URL')
+    is_vip = models.BooleanField(default=False, verbose_name='是否VIP用户')
+    vip_expire_date = models.DateTimeField(blank=True, null=True, verbose_name='VIP过期时间')
     
     class Meta:
         verbose_name = '用户'
         verbose_name_plural = '用户'
+    
+    def is_vip_active(self):
+        """检查VIP是否有效"""
+        if not self.is_vip:
+            return False
+        if self.vip_expire_date is None:
+            return True  # 永久VIP
+        return timezone.now() < self.vip_expire_date
 
 
 class Category(models.Model):
@@ -64,6 +74,7 @@ class Post(models.Model):
     # 状态字段
     is_published = models.BooleanField(default=True, verbose_name='是否发布')
     is_featured = models.BooleanField(default=False, verbose_name='是否推荐')
+    is_vip_only = models.BooleanField(default=False, verbose_name='是否VIP文章')
     
     created_at = models.DateTimeField(auto_now_add=True, verbose_name='创建时间')
     updated_at = models.DateTimeField(auto_now=True, verbose_name='更新时间')
