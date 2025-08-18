@@ -937,6 +937,28 @@ body {
     color: #333;
 }
 
+/* 侧边栏VIP样式 */
+.sidebar-card .vip-badge {
+    font-size: 0.6rem;
+    padding: 2px 4px;
+    margin-left: 4px;
+}
+
+.sidebar-card .vip-icon {
+    font-size: 0.6em;
+}
+
+.recent-post .vip-badge {
+    font-size: 0.55rem;
+    padding: 1px 4px;
+}
+
+/* 搜索结果VIP样式 */
+.search-results .vip-badge {
+    flex-shrink: 0;
+    margin-left: 8px;
+}
+
 /* 响应式VIP样式 */
 @media (max-width: 768px) {
     .vip-badge {
@@ -952,5 +974,15 @@ body {
         flex-direction: column;
         align-items: flex-start;
         gap: 4px;
+    }
+    
+    .sidebar-card .vip-badge {
+        font-size: 0.5rem;
+        padding: 1px 3px;
+    }
+    
+    .recent-post .vip-badge {
+        font-size: 0.45rem;
+        padding: 1px 3px;
     }
 }

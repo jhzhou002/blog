@@ -28,9 +28,7 @@ def index(request):
     # 获取已发布的文章，支持分类筛选
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
     
-    # VIP文章访问控制：非VIP用户不显示VIP文章
-    if not request.user.is_authenticated or not request.user.is_vip_active():
-        posts = posts.filter(is_vip_only=False)
+    # 注意：所有用户都可以看到VIP文章列表，只是访问时会有限制
     
     # 当前选中的分类
     current_category = None
@@ -46,17 +44,11 @@ def index(request):
     page_number = request.GET.get('page')
     posts = paginator.get_page(page_number)
     
-    # 最近文章
-    recent_posts = Post.objects.filter(is_published=True)
-    if not request.user.is_authenticated or not request.user.is_vip_active():
-        recent_posts = recent_posts.filter(is_vip_only=False)
-    recent_posts = recent_posts.order_by('-created_at')[:5]
+    # 最近文章（包含VIP文章，用于显示标识）
+    recent_posts = Post.objects.filter(is_published=True).order_by('-created_at')[:5]
     
-    # 推荐阅读（按浏览量排序）
-    recommended_posts = Post.objects.filter(is_published=True)
-    if not request.user.is_authenticated or not request.user.is_vip_active():
-        recommended_posts = recommended_posts.filter(is_vip_only=False)
-    recommended_posts = recommended_posts.order_by('-views', '-likes')[:5]
+    # 推荐阅读（按浏览量排序，包含VIP文章）
+    recommended_posts = Post.objects.filter(is_published=True).order_by('-views', '-likes')[:5]
     
     # 分类统计
     categories = Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0)[:10]
@@ -101,17 +93,11 @@ def post_detail(request, pk):
     # 获取评论
     comments = Comment.objects.filter(post=post, is_approved=True, parent=None).order_by('-created_at')
     
-    # 相关文章（排除VIP文章，除非用户是VIP）
+    # 相关文章（包含VIP文章，用于显示标识）
     related_posts = Post.objects.filter(
         category=post.category, 
         is_published=True
-    ).exclude(pk=post.pk)
-    
-    # 如果用户不是VIP，过滤掉VIP文章
-    if not request.user.is_authenticated or not request.user.is_vip_active():
-        related_posts = related_posts.filter(is_vip_only=False)
-    
-    related_posts = related_posts[:4]
+    ).exclude(pk=post.pk)[:4]
     
     # 检查用户是否已点赞/收藏
     user_liked = False
@@ -124,10 +110,18 @@ def post_detail(request, pk):
             user=request.user, post=post, action='favorite'
         ).exists()
     
+    # 侧边栏数据
+    recent_posts = Post.objects.filter(is_published=True).order_by('-created_at')[:5]
+    categories = Category.objects.annotate(post_count=Count('post')).filter(post_count__gt=0)[:10]
+    tags = Tag.objects.annotate(post_count=Count('post')).filter(post_count__gt=0).order_by('-post_count')[:20]
+    
     context = {
         'post': post,
         'comments': comments,
         'related_posts': related_posts,
+        'recent_posts': recent_posts,
+        'categories': categories,
+        'tags': tags,
         'user_liked': user_liked,
         'user_favorited': user_favorited,
     }
@@ -138,7 +132,7 @@ def post_detail(request, pk):
 def category_posts(request, pk):
     """分类文章列表"""
     category = get_object_or_404(Category, pk=pk)
-    posts = Post.objects.filter(category=category, is_published=True)
+    posts = Post.objects.filter(category=category, is_published=True)  # 包含VIP文章
     
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
@@ -156,7 +150,7 @@ def category_posts(request, pk):
 def tag_posts(request, pk):
     """标签文章列表"""
     tag = get_object_or_404(Tag, pk=pk)
-    posts = Post.objects.filter(tags=tag, is_published=True)
+    posts = Post.objects.filter(tags=tag, is_published=True)  # 包含VIP文章
     
     paginator = Paginator(posts, 10)
     page_number = request.GET.get('page')
@@ -206,7 +200,7 @@ def search(request):
             Q(summary__icontains=query) | 
             Q(content__icontains=query),
             is_published=True
-        ).distinct()
+        ).distinct()  # 包含VIP文章，显示时会有标识
         
         paginator = Paginator(posts, 10)
         page_number = request.GET.get('page')
