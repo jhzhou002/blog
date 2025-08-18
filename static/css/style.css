@@ -910,11 +910,33 @@ body {
     justify-content: center;
 }
 
-.mobile-filter-tabs {
+/* 移动端两行菜单布局 */
+.mobile-filter-row-1 {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 12px;
+    justify-content: flex-start;
+}
+
+.mobile-filter-row-2 {
+    margin-bottom: 8px;
+}
+
+.category-tabs {
     display: flex;
     gap: 8px;
     overflow-x: auto;
     padding-bottom: 5px;
+}
+
+.primary-tab {
+    flex: 0 0 auto;
+    min-width: 80px;
+    text-align: center;
+}
+
+.category-tab {
+    flex-shrink: 0;
 }
 
 .filter-tab {

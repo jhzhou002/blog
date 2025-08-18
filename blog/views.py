@@ -24,11 +24,14 @@ def index(request):
     
     # 获取筛选参数
     category_id = request.GET.get('category')
+    vip_only = request.GET.get('vip_only')
     
-    # 获取已发布的文章，支持分类筛选
+    # 获取已发布的文章，支持分类和VIP筛选
     posts = Post.objects.filter(is_published=True).select_related('category', 'author').prefetch_related('tags')
     
-    # 注意：所有用户都可以看到VIP文章列表，只是访问时会有限制
+    # VIP筛选
+    if vip_only:
+        posts = posts.filter(is_vip_only=True)
     
     # 当前选中的分类
     current_category = None

@@ -342,3 +342,53 @@ function initMobileSidebar() {
 
 // Initialize mobile sidebar
 initMobileSidebar();
+
+// Mobile filter functionality
+function initMobileFilters() {
+    const primaryTabs = document.querySelectorAll('.primary-tab');
+    const allCategories = document.getElementById('allCategories');
+    const vipCategories = document.getElementById('vipCategories');
+    
+    primaryTabs.forEach(tab => {
+        tab.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // 更新第一行按钮状态
+            primaryTabs.forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+            
+            // 根据选择显示对应的分类
+            const filter = this.dataset.filter;
+            if (filter === 'vip') {
+                // 显示VIP分类
+                if (allCategories) allCategories.classList.add('d-none');
+                if (vipCategories) vipCategories.classList.remove('d-none');
+                
+                // 根据VIP筛选更新URL
+                const url = new URL(window.location.href);
+                url.searchParams.set('vip_only', '1');
+                window.history.pushState({}, '', url.toString());
+                
+                // 重新加载页面内容
+                window.location.href = url.toString();
+            } else {
+                // 显示所有分类
+                if (allCategories) allCategories.classList.remove('d-none');
+                if (vipCategories) vipCategories.classList.add('d-none');
+                
+                // 移除VIP筛选
+                const url = new URL(window.location.href);
+                url.searchParams.delete('vip_only');
+                window.history.pushState({}, '', url.toString());
+                
+                // 重新加载页面内容
+                window.location.href = url.toString();
+            }
+        });
+    });
+}
+
+// Initialize mobile filters
+if (window.innerWidth <= 767) {
+    initMobileFilters();
+}

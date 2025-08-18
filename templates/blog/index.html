@@ -60,12 +60,24 @@
                 </button>
             </form>
         </div>
-        <div class="mobile-filter-tabs">
-            <a href="{% url 'blog:index' %}" class="filter-tab {% if not request.resolver_match.kwargs %}active{% endif %}">全部</a>
-            <a href="#" class="filter-tab" onclick="toggleVipFilter()">VIP文章</a>
-            {% for category in categories|slice:":3" %}
-                <a href="{% url 'blog:category_posts' category.pk %}" class="filter-tab">{{ category.name }}</a>
-            {% endfor %}
+        <!-- 第一行：全部/VIP文章切换 -->
+        <div class="mobile-filter-row-1">
+            <a href="{% url 'blog:index' %}" class="filter-tab primary-tab {% if not request.GET.vip_only %}active{% endif %}" data-filter="all">全部</a>
+            <a href="#" class="filter-tab primary-tab {% if request.GET.vip_only %}active{% endif %}" data-filter="vip">VIP文章</a>
+        </div>
+        
+        <!-- 第二行：分类筛选 -->
+        <div class="mobile-filter-row-2" id="categoryRow">
+            <div class="category-tabs" id="allCategories">
+                {% for category in categories %}
+                    <a href="{% url 'blog:category_posts' category.pk %}" class="filter-tab category-tab" data-category-id="{{ category.pk }}">{{ category.name }}</a>
+                {% endfor %}
+            </div>
+            <div class="category-tabs d-none" id="vipCategories">
+                {% for category in categories %}
+                    <a href="{% url 'blog:category_posts' category.pk %}?vip_only=1" class="filter-tab category-tab" data-category-id="{{ category.pk }}">{{ category.name }}</a>
+                {% endfor %}
+            </div>
         </div>
     </div>
 
