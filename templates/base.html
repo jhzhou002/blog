@@ -16,8 +16,69 @@
     {% block extra_head %}{% endblock %}
 </head>
 <body data-authenticated="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+    <!-- Mobile Sidebar Overlay -->
+    <div class="mobile-sidebar-overlay d-md-none" id="sidebarOverlay"></div>
+    
+    <!-- Mobile Sidebar -->
+    <div class="mobile-sidebar d-md-none" id="mobileSidebar">
+        <div class="sidebar-header">
+            <h5>MyBlog</h5>
+            <button class="sidebar-close" id="sidebarClose">
+                <i class="fas fa-times"></i>
+            </button>
+        </div>
+        <div class="sidebar-content">
+            <ul class="sidebar-nav">
+                <li><a href="{% url 'blog:index' %}" class="{% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                    <i class="fas fa-home"></i> 首页
+                </a></li>
+                {% for category in site_categories %}
+                <li><a href="{% url 'blog:category_posts' category.pk %}">
+                    <i class="fas fa-folder"></i> {{ category.name }}
+                </a></li>
+                {% endfor %}
+                <li><a href="{% url 'blog:search' %}">
+                    <i class="fas fa-search"></i> 搜索
+                </a></li>
+                <li><a href="{% url 'blog:about' %}">
+                    <i class="fas fa-info-circle"></i> 关于
+                </a></li>
+                {% if user.is_authenticated %}
+                    <li class="sidebar-divider"></li>
+                    <li><a href="{% url 'blog:profile' %}">
+                        <i class="fas fa-user"></i> 个人中心
+                    </a></li>
+                    {% if user.is_admin or user.is_superuser %}
+                        <li><a href="{% url 'blog:admin_dashboard' %}">
+                            <i class="fas fa-cog"></i> 后台管理
+                        </a></li>
+                    {% endif %}
+                    <li><a href="{% url 'blog:logout' %}">
+                        <i class="fas fa-sign-out-alt"></i> 退出登录
+                    </a></li>
+                {% else %}
+                    <li class="sidebar-divider"></li>
+                    <li><a href="{% url 'blog:login' %}">
+                        <i class="fas fa-sign-in-alt"></i> 登录
+                    </a></li>
+                    <li><a href="{% url 'blog:register' %}">
+                        <i class="fas fa-user-plus"></i> 注册
+                    </a></li>
+                {% endif %}
+            </ul>
+        </div>
+    </div>
+
+    <!-- Mobile Header (only visible on mobile) -->
+    <div class="mobile-header d-md-none">
+        <button class="mobile-menu-btn" id="mobileMenuBtn">
+            <i class="fas fa-bars"></i>
+        </button>
+        <h1 class="mobile-logo">MyBlog</h1>
+    </div>
+
     <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom">
+    <nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom d-none d-md-block">
         <div class="container">
             <a class="navbar-brand fw-bold fs-4" href="{% url 'blog:index' %}">MyBlog</a>
             

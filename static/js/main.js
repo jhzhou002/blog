@@ -299,3 +299,46 @@ function initBackToTopButton() {
 
 // Initialize back to top button
 initBackToTopButton();
+
+// Mobile Sidebar functionality
+function initMobileSidebar() {
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const mobileSidebar = document.getElementById('mobileSidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    const sidebarClose = document.getElementById('sidebarClose');
+    
+    if (mobileMenuBtn && mobileSidebar && sidebarOverlay && sidebarClose) {
+        // Open sidebar
+        mobileMenuBtn.addEventListener('click', function() {
+            mobileSidebar.classList.add('active');
+            sidebarOverlay.classList.add('active');
+            document.body.style.overflow = 'hidden';
+        });
+        
+        // Close sidebar
+        function closeSidebar() {
+            mobileSidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+            document.body.style.overflow = '';
+        }
+        
+        sidebarClose.addEventListener('click', closeSidebar);
+        sidebarOverlay.addEventListener('click', closeSidebar);
+        
+        // Close on link click (optional)
+        const sidebarLinks = document.querySelectorAll('.sidebar-nav a');
+        sidebarLinks.forEach(link => {
+            link.addEventListener('click', closeSidebar);
+        });
+        
+        // Close on escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape' && mobileSidebar.classList.contains('active')) {
+                closeSidebar();
+            }
+        });
+    }
+}
+
+// Initialize mobile sidebar
+initMobileSidebar();
