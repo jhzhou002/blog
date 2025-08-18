@@ -56,7 +56,7 @@
             <!-- Blog Posts -->
             <div class="posts-section">
                 {% for post in posts %}
-                <article class="post-card{% if post.is_vip_only %} vip-post-card{% endif %}">
+                <article class="post-card">
                     <div class="post-card-content">
                         <!-- 左侧封面图 -->
                         <div class="post-card-img-wrapper">
@@ -79,18 +79,13 @@
                                         </a>
                                     {% endif %}
                                     {% if post.is_vip_only %}
-                                        <span class="vip-badge">
-                                            <i class="fas fa-crown"></i> VIP
-                                        </span>
+                                        <span class="vip-badge">VIP</span>
                                     {% endif %}
                                 </div>
                                 
                                 <h3>
-                                    <a href="{{ post.get_absolute_url }}" class="post-title{% if post.is_vip_only %} vip-title{% endif %}">
+                                    <a href="{{ post.get_absolute_url }}" class="post-title">
                                         {{ post.title }}
-                                        {% if post.is_vip_only %}
-                                            <i class="fas fa-crown vip-icon"></i>
-                                        {% endif %}
                                     </a>
                                 </h3>
                                 

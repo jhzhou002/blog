@@ -825,41 +825,21 @@ body {
 .vip-badge {
     display: inline-flex;
     align-items: center;
-    padding: 4px 8px;
-    background: var(--vip-gradient);
-    color: #333;
-    border-radius: 12px;
-    font-size: 0.75rem;
-    font-weight: bold;
+    padding: 2px 6px;
+    background: #ffc107;
+    color: #fff;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: 500;
     margin-left: 8px;
-    text-shadow: none;
-    box-shadow: 0 2px 4px rgba(255, 215, 0, 0.3);
 }
 
 .vip-badge i {
     margin-right: 2px;
-    font-size: 0.7rem;
+    font-size: 0.65rem;
 }
 
-.vip-post-card {
-    position: relative;
-    border: 2px solid var(--vip-gold) !important;
-    box-shadow: 0 4px 20px rgba(255, 215, 0, 0.2) !important;
-    background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(255, 237, 78, 0.05));
-}
-
-.vip-post-card::before {
-    content: "";
-    position: absolute;
-    top: -1px;
-    left: -1px;
-    right: -1px;
-    bottom: -1px;
-    background: var(--vip-gradient);
-    border-radius: 8px;
-    z-index: -1;
-    opacity: 0.3;
-}
+/* 移除VIP文章卡片的特殊效果，保持普通样式 */
 
 .post-card-header {
     display: flex;
@@ -869,28 +849,9 @@ body {
     gap: 8px;
 }
 
-.vip-title {
-    color: #b8860b;
-}
+/* 移除VIP标题的特殊颜色和图标动画效果 */
 
-.vip-icon {
-    color: var(--vip-gold);
-    margin-left: 4px;
-    font-size: 0.8em;
-    text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    animation: vip-glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes vip-glow {
-    from {
-        text-shadow: 0 1px 2px rgba(0,0,0,0.3);
-    }
-    to {
-        text-shadow: 0 1px 8px rgba(255, 215, 0, 0.8), 0 1px 2px rgba(0,0,0,0.3);
-    }
-}
-
-/* 文章详情页VIP样式 */
+/* 保留VIP文章详情页的头部提示样式 */
 .vip-post-header {
     background: var(--vip-gradient);
     color: #333;
@@ -907,24 +868,6 @@ body {
     display: block;
 }
 
-/* VIP状态标识 */
-.vip-status-badge {
-    display: inline-flex;
-    align-items: center;
-    padding: 6px 12px;
-    background: var(--vip-gradient);
-    color: #333;
-    border-radius: 15px;
-    font-weight: bold;
-    font-size: 0.85rem;
-    box-shadow: 0 2px 6px rgba(255, 215, 0, 0.3);
-}
-
-.vip-status-badge .fa-crown {
-    margin-right: 4px;
-    font-size: 0.8rem;
-}
-
 /* 管理员页面VIP按钮样式 */
 .btn-outline-warning.vip-btn {
     border-color: var(--vip-gold);
@@ -937,26 +880,16 @@ body {
     color: #333;
 }
 
-/* 侧边栏VIP样式 */
+/* 侧边栏VIP样式优化 */
 .sidebar-card .vip-badge {
     font-size: 0.6rem;
     padding: 2px 4px;
     margin-left: 4px;
 }
 
-.sidebar-card .vip-icon {
-    font-size: 0.6em;
-}
-
 .recent-post .vip-badge {
     font-size: 0.55rem;
     padding: 1px 4px;
-}
-
-/* 搜索结果VIP样式 */
-.search-results .vip-badge {
-    flex-shrink: 0;
-    margin-left: 8px;
 }
 
 /* 响应式VIP样式 */

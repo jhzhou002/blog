@@ -26,17 +26,12 @@
                             </a>
                         {% endif %}
                         {% if post.is_vip_only %}
-                            <span class="vip-status-badge">
-                                <i class="fas fa-crown"></i> VIP专属
-                            </span>
+                            <span class="vip-badge">VIP</span>
                         {% endif %}
                     </div>
                     
-                    <h1 class="post-title{% if post.is_vip_only %} vip-title{% endif %}">
+                    <h1 class="post-title">
                         {{ post.title }}
-                        {% if post.is_vip_only %}
-                            <i class="fas fa-crown vip-icon"></i>
-                        {% endif %}
                     </h1>
                     
                     <div class="post-meta">
@@ -99,25 +94,20 @@
                 <div class="row">
                     {% for related_post in related_posts %}
                     <div class="col-md-6 mb-3">
-                        <div class="card{% if related_post.is_vip_only %} vip-post-card{% endif %}">
+                        <div class="card">
                             {% if related_post.cover_image %}
                                 <img src="{{ related_post.cover_image }}" class="card-img-top" alt="{{ related_post.title }}" style="height: 150px; object-fit: cover;">
                             {% endif %}
                             <div class="card-body">
                                 <h6>
-                                    <a href="{{ related_post.get_absolute_url }}" class="text-decoration-none{% if related_post.is_vip_only %} vip-title{% endif %}">
+                                    <a href="{{ related_post.get_absolute_url }}" class="text-decoration-none">
                                         {{ related_post.title }}
-                                        {% if related_post.is_vip_only %}
-                                            <i class="fas fa-crown vip-icon"></i>
-                                        {% endif %}
                                     </a>
                                 </h6>
                                 <div class="d-flex justify-content-between align-items-center">
                                     <small class="text-muted">{{ related_post.created_at|date:"Y-m-d" }}</small>
                                     {% if related_post.is_vip_only %}
-                                        <span class="vip-badge">
-                                            <i class="fas fa-crown"></i> VIP
-                                        </span>
+                                        <span class="vip-badge">VIP</span>
                                     {% endif %}
                                 </div>
                             </div>
@@ -260,18 +250,13 @@
                 <h5>最近文章</h5>
                 {% for recent_post in recent_posts %}
                 <div class="recent-post">
-                    <a href="{{ recent_post.get_absolute_url }}" class="recent-post-title{% if recent_post.is_vip_only %} vip-title{% endif %}">
+                    <a href="{{ recent_post.get_absolute_url }}" class="recent-post-title">
                         {{ recent_post.title }}
-                        {% if recent_post.is_vip_only %}
-                            <i class="fas fa-crown vip-icon ms-1"></i>
-                        {% endif %}
                     </a>
                     <div class="d-flex justify-content-between align-items-center">
                         <div class="recent-post-date">{{ recent_post.created_at|date:"Y-m-d" }}</div>
                         {% if recent_post.is_vip_only %}
-                            <small class="vip-badge">
-                                <i class="fas fa-crown"></i> VIP
-                            </small>
+                            <small class="vip-badge">VIP</small>
                         {% endif %}
                     </div>
                 </div>
