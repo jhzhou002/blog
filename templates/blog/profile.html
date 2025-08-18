@@ -16,9 +16,9 @@
                         <div class="col-md-3 text-center mb-3">
                             <div class="position-relative d-inline-block">
                                 {% if user.avatar %}
-                                    <img src="{{ user.avatar }}" class="rounded-circle mb-2 avatar-upload-btn" width="100" height="100" alt="头像" style="cursor: pointer;">
+                                    <img src="{{ user.avatar }}" class="rounded-circle mb-2 avatar-upload-btn" width="100" height="100" alt="头像" style="cursor: pointer;" onclick="console.log('Image clicked directly')">
                                 {% else %}
-                                    <div class="bg-light rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center avatar-upload-btn" style="width: 100px; height: 100px; cursor: pointer;">
+                                    <div class="bg-light rounded-circle mx-auto mb-2 d-flex align-items-center justify-content-center avatar-upload-btn" style="width: 100px; height: 100px; cursor: pointer;" onclick="console.log('Div clicked directly')">
                                         <i class="fas fa-user fa-2x text-muted"></i>
                                     </div>
                                 {% endif %}
@@ -139,19 +139,37 @@
 <script>
 // 头像上传功能
 document.addEventListener('DOMContentLoaded', function() {
+    console.log('Profile page loaded, initializing avatar upload...');
+    
     const avatarUploadBtn = document.querySelector('.avatar-upload-btn');
     const avatarInput = document.getElementById('avatarInput');
     const avatarForm = document.getElementById('avatarUploadForm');
     
-    avatarUploadBtn.addEventListener('click', function() {
-        avatarInput.click();
+    console.log('Avatar elements found:', {
+        btn: !!avatarUploadBtn,
+        input: !!avatarInput,
+        form: !!avatarForm
     });
     
-    avatarInput.addEventListener('change', function() {
-        if (this.files && this.files[0]) {
-            avatarForm.submit();
-        }
-    });
+    if (avatarUploadBtn && avatarInput && avatarForm) {
+        avatarUploadBtn.addEventListener('click', function(e) {
+            console.log('Avatar button clicked');
+            e.preventDefault();
+            avatarInput.click();
+        });
+        
+        avatarInput.addEventListener('change', function(e) {
+            console.log('File selected:', this.files);
+            if (this.files && this.files[0]) {
+                console.log('Submitting form...');
+                avatarForm.submit();
+            }
+        });
+        
+        console.log('Avatar upload event listeners added');
+    } else {
+        console.error('Avatar upload elements not found');
+    }
 });
 </script>
 {% endblock %}
