@@ -17,6 +17,10 @@ body {
     font-family: 'Arial', 'Microsoft YaHei', sans-serif;
     line-height: 1.6;
     background-color: #f8f9fa;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    margin: 0;
 }
 
 /* Navigation */
@@ -655,33 +659,6 @@ body {
     color: rgba(255, 255, 255, 0.8) !important;
 }
 
-/* Avatar upload styles */
-.avatar-upload-btn {
-    position: relative;
-    transition: all 0.3s ease;
-}
-
-.avatar-overlay {
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background: rgba(0, 0, 0, 0.5);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    opacity: 0;
-    transition: opacity 0.3s ease;
-    color: white;
-    font-size: 1.5rem;
-    margin-bottom: 8px;
-}
-
-.avatar-upload-btn:hover .avatar-overlay {
-    opacity: 1;
-}
 
 /* Mobile Bottom Navigation */
 .mobile-bottom-nav {
@@ -753,6 +730,12 @@ body {
     /* Hide regular navbar on mobile */
     .navbar {
         display: none !important;
+    }
+    
+    /* Ensure main content takes available space on mobile */
+    main {
+        flex: 1 0 auto;
+        padding-bottom: 20px;
     }
     
     /* Adjust back to top button position */
@@ -890,6 +873,61 @@ body {
 .recent-post .vip-badge {
     font-size: 0.55rem;
     padding: 1px 4px;
+}
+
+/* 头像上传样式 */
+.avatar-upload-btn {
+    position: relative;
+    cursor: pointer !important;
+    transition: transform 0.2s ease;
+    display: inline-block;
+}
+
+.avatar-upload-btn:hover {
+    transform: scale(1.05);
+}
+
+.avatar-upload-btn img,
+.avatar-upload-btn > div {
+    cursor: pointer !important;
+}
+
+.avatar-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+    border-radius: 50%;
+    cursor: pointer;
+}
+
+.avatar-upload-btn:hover .avatar-overlay {
+    opacity: 1;
+}
+
+.avatar-overlay i {
+    font-size: 1.8rem;
+    pointer-events: none;
+}
+
+/* Footer固定在底部的布局样式 */
+main {
+    flex: 1 0 auto;
+    width: 100%;
+}
+
+footer {
+    flex-shrink: 0;
+    width: 100%;
+    margin-top: auto;
 }
 
 /* 响应式VIP样式 */
