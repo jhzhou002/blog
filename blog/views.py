@@ -361,13 +361,20 @@ def upload_avatar(request):
 @require_POST
 def like_post(request, pk):
     """点赞文章"""
+    # 添加调试日志
+    print(f"点赞请求 - 用户: {request.user}, 是否认证: {request.user.is_authenticated}")
+    print(f"请求头: {request.headers}")
+    print(f"会话: {request.session.session_key}")
+    
     if not request.user.is_authenticated:
+        print("用户未认证，返回错误响应")
         return JsonResponse({
             'success': False,
             'message': '请先登录'
         })
     
     post = get_object_or_404(Post, pk=pk)
+    print(f"处理文章: {post.title}")
     
     action, created = UserAction.objects.get_or_create(
         user=request.user,
@@ -379,29 +386,41 @@ def like_post(request, pk):
         action.delete()
         post.likes -= 1
         liked = False
+        print(f"取消点赞，当前点赞数: {post.likes}")
     else:
         post.likes += 1
         liked = True
+        print(f"添加点赞，当前点赞数: {post.likes}")
     
     post.save()
     
-    return JsonResponse({
+    response_data = {
         'success': True,
         'liked': liked,
         'count': post.likes
-    })
+    }
+    print(f"返回响应: {response_data}")
+    
+    return JsonResponse(response_data)
 
 
 @require_POST
 def favorite_post(request, pk):
     """收藏文章"""
+    # 添加调试日志
+    print(f"收藏请求 - 用户: {request.user}, 是否认证: {request.user.is_authenticated}")
+    print(f"请求头: {request.headers}")
+    print(f"会话: {request.session.session_key}")
+    
     if not request.user.is_authenticated:
+        print("用户未认证，返回错误响应")
         return JsonResponse({
             'success': False,
             'message': '请先登录'
         })
     
     post = get_object_or_404(Post, pk=pk)
+    print(f"处理文章: {post.title}")
     
     action, created = UserAction.objects.get_or_create(
         user=request.user,
@@ -413,17 +432,22 @@ def favorite_post(request, pk):
         action.delete()
         post.favorites -= 1
         favorited = False
+        print(f"取消收藏，当前收藏数: {post.favorites}")
     else:
         post.favorites += 1
         favorited = True
+        print(f"添加收藏，当前收藏数: {post.favorites}")
     
     post.save()
     
-    return JsonResponse({
+    response_data = {
         'success': True,
         'favorited': favorited,
         'count': post.favorites
-    })
+    }
+    print(f"返回响应: {response_data}")
+    
+    return JsonResponse(response_data)
 
 
 @login_required

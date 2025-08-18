@@ -64,11 +64,15 @@ document.addEventListener('DOMContentLoaded', function() {
 
 // Like post function
 function likePost(postId, button) {
+    console.log('点赞操作:', postId, '用户认证状态:', isAuthenticated());
+    
     if (!isAuthenticated()) {
+        console.log('用户未登录，显示登录模态框');
         showLoginModal();
         return;
     }
     
+    console.log('发送点赞请求到:', `/post/${postId}/like/`);
     fetch(`/post/${postId}/like/`, {
         method: 'POST',
         headers: {
@@ -76,42 +80,58 @@ function likePost(postId, button) {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('点赞响应状态:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('点赞响应数据:', data);
         if (data.success) {
             const countElement = button.querySelector('.like-count');
+            const textElement = button.querySelector('.like-text');
             const icon = button.querySelector('i');
             
             if (data.liked) {
                 button.classList.add('liked');
                 icon.classList.remove('far');
                 icon.classList.add('fas');
+                if (textElement) textElement.textContent = '已点赞';
             } else {
                 button.classList.remove('liked');
                 icon.classList.remove('fas');
                 icon.classList.add('far');
+                if (textElement) textElement.textContent = '点赞';
             }
             
             if (countElement) {
                 countElement.textContent = data.count;
             }
         } else {
-            showAlert('操作失败', 'error');
+            console.error('点赞操作失败:', data.message);
+            if (data.message && data.message.includes('登录')) {
+                showLoginModal();
+            } else {
+                showAlert('操作失败', 'error');
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('点赞请求错误:', error);
         showAlert('网络错误', 'error');
     });
 }
 
 // Favorite post function
 function favoritePost(postId, button) {
+    console.log('收藏操作:', postId, '用户认证状态:', isAuthenticated());
+    
     if (!isAuthenticated()) {
+        console.log('用户未登录，显示登录模态框');
         showLoginModal();
         return;
     }
     
+    console.log('发送收藏请求到:', `/post/${postId}/favorite/`);
     fetch(`/post/${postId}/favorite/`, {
         method: 'POST',
         headers: {
@@ -119,31 +139,43 @@ function favoritePost(postId, button) {
             'Content-Type': 'application/json',
         },
     })
-    .then(response => response.json())
+    .then(response => {
+        console.log('收藏响应状态:', response.status);
+        return response.json();
+    })
     .then(data => {
+        console.log('收藏响应数据:', data);
         if (data.success) {
             const countElement = button.querySelector('.favorite-count');
+            const textElement = button.querySelector('.favorite-text');
             const icon = button.querySelector('i');
             
             if (data.favorited) {
                 button.classList.add('favorited');
                 icon.classList.remove('far');
                 icon.classList.add('fas');
+                if (textElement) textElement.textContent = '已收藏';
             } else {
                 button.classList.remove('favorited');
                 icon.classList.remove('fas');
                 icon.classList.add('far');
+                if (textElement) textElement.textContent = '收藏';
             }
             
             if (countElement) {
                 countElement.textContent = data.count;
             }
         } else {
-            showAlert('操作失败', 'error');
+            console.error('收藏操作失败:', data.message);
+            if (data.message && data.message.includes('登录')) {
+                showLoginModal();
+            } else {
+                showAlert('操作失败', 'error');
+            }
         }
     })
     .catch(error => {
-        console.error('Error:', error);
+        console.error('收藏请求错误:', error);
         showAlert('网络错误', 'error');
     });
 }

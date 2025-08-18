@@ -55,17 +55,17 @@
                 <div class="post-actions">
                     <div class="row">
                         <div class="col-6">
-                            <button class="btn btn-outline-primary" onclick="likePost({{ post.pk }})">
-                                <i class="far fa-heart"></i> 
-                                <span id="like-text">{% if user_liked %}已点赞{% else %}点赞{% endif %}</span>
-                                (<span id="like-count">{{ post.likes }}</span>)
+                            <button class="btn btn-outline-primary like-btn {% if user_liked %}liked{% endif %}" data-post-id="{{ post.pk }}">
+                                <i class="{% if user_liked %}fas{% else %}far{% endif %} fa-heart"></i> 
+                                <span class="like-text">{% if user_liked %}已点赞{% else %}点赞{% endif %}</span>
+                                (<span class="like-count">{{ post.likes }}</span>)
                             </button>
                         </div>
                         <div class="col-6 text-end">
-                            <button class="btn btn-outline-warning" onclick="favoritePost({{ post.pk }})">
-                                <i class="far fa-star"></i> 
-                                <span id="favorite-text">{% if user_favorited %}已收藏{% else %}收藏{% endif %}</span>
-                                (<span id="favorite-count">{{ post.favorites }}</span>)
+                            <button class="btn btn-outline-warning favorite-btn {% if user_favorited %}favorited{% endif %}" data-post-id="{{ post.pk }}">
+                                <i class="{% if user_favorited %}fas{% else %}far{% endif %} fa-star"></i> 
+                                <span class="favorite-text">{% if user_favorited %}已收藏{% else %}收藏{% endif %}</span>
+                                (<span class="favorite-count">{{ post.favorites }}</span>)
                             </button>
                         </div>
                     </div>
@@ -260,94 +260,62 @@
 
 {% block extra_js %}
 <script>
-const isAuthenticated = {% if user.is_authenticated %}true{% else %}false{% endif %};
-
-function likePost(postId) {
-    if (!isAuthenticated) {
-        window.location.href = '{% url "blog:login" %}';
-        return;
-    }
-    
-    fetch(`/post/${postId}/like/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('like-text').textContent = data.liked ? '已点赞' : '点赞';
-            document.getElementById('like-count').textContent = data.count;
-        } else {
-            window.location.href = '{% url "blog:login" %}';
-        }
-    });
-}
-
-function favoritePost(postId) {
-    if (!isAuthenticated) {
-        window.location.href = '{% url "blog:login" %}';
-        return;
-    }
-    
-    fetch(`/post/${postId}/favorite/`, {
-        method: 'POST',
-        headers: {
-            'X-CSRFToken': getCookie('csrftoken'),
-        },
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            document.getElementById('favorite-text').textContent = data.favorited ? '已收藏' : '收藏';
-            document.getElementById('favorite-count').textContent = data.count;
-        } else {
-            window.location.href = '{% url "blog:login" %}';
-        }
-    });
-}
-
+// 评论相关函数
 function replyComment(commentId) {
-    document.getElementById(`reply-form-${commentId}`).style.display = 'block';
+    console.log('显示回复表单:', commentId);
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'block';
+    } else {
+        console.error('未找到回复表单元素:', `reply-form-${commentId}`);
+    }
 }
 
 function cancelReply(commentId) {
-    document.getElementById(`reply-form-${commentId}`).style.display = 'none';
+    console.log('隐藏回复表单:', commentId);
+    const replyForm = document.getElementById(`reply-form-${commentId}`);
+    if (replyForm) {
+        replyForm.style.display = 'none';
+    } else {
+        console.error('未找到回复表单元素:', `reply-form-${commentId}`);
+    }
 }
 
 function toggleReplies(commentId) {
+    console.log('切换回复显示状态:', commentId);
     const repliesContainer = document.getElementById(`replies-${commentId}`);
     const toggleText = document.getElementById(`toggle-text-${commentId}`);
     const toggleIcon = document.getElementById(`toggle-icon-${commentId}`);
     
+    if (!repliesContainer) {
+        console.error('未找到回复容器:', `replies-${commentId}`);
+        return;
+    }
+    
+    if (!toggleText) {
+        console.error('未找到切换文本元素:', `toggle-text-${commentId}`);
+        return;
+    }
+    
+    if (!toggleIcon) {
+        console.error('未找到切换图标元素:', `toggle-icon-${commentId}`);
+        return;
+    }
+    
     if (repliesContainer.classList.contains('d-none')) {
+        console.log('显示回复');
         repliesContainer.classList.remove('d-none');
         repliesContainer.classList.add('d-block');
         toggleText.textContent = '收起回复';
         toggleIcon.className = 'fas fa-chevron-up';
     } else {
+        console.log('隐藏回复');
         repliesContainer.classList.remove('d-block');
         repliesContainer.classList.add('d-none');
         const replyCount = repliesContainer.querySelectorAll('.comment.reply').length;
         toggleText.textContent = `展开回复 (${replyCount})`;
         toggleIcon.className = 'fas fa-chevron-down';
     }
-}
-
-function getCookie(name) {
-    let cookieValue = null;
-    if (document.cookie && document.cookie !== '') {
-        const cookies = document.cookie.split(';');
-        for (let i = 0; i < cookies.length; i++) {
-            const cookie = cookies[i].trim();
-            if (cookie.substring(0, name.length + 1) === (name + '=')) {
-                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
-                break;
-            }
-        }
-    }
-    return cookieValue;
 }
 </script>
 {% endblock %}
