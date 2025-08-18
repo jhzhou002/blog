@@ -317,7 +317,7 @@ function toggleReplies(commentId) {
     const toggleText = document.getElementById(`toggle-text-${commentId}`);
     const toggleIcon = document.getElementById(`toggle-icon-${commentId}`);
     
-    if (repliesContainer.style.display === 'none') {
+    if (repliesContainer.style.display === 'none' || repliesContainer.style.display === '') {
         repliesContainer.style.display = 'block';
         toggleText.textContent = '收起回复';
         toggleIcon.className = 'fas fa-chevron-up';
