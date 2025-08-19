@@ -1,6 +1,5 @@
 {% extends 'base.html' %}
 {% load static %}
-{% load markdown_extras %}
 
 {% block title %}{{ post.title }} - {{ site_name }}{% endblock %}
 
@@ -44,12 +43,8 @@
                         </div>
                     {% endif %}
                     
-                    <div class="post-body">
-                        {% if post.content|is_markdown %}
-                            {{ post.content|markdown }}
-                        {% else %}
-                            {{ post.content|linebreaks }}
-                        {% endif %}
+                    <div class="post-body" id="post-content">
+                        {{ post.content|linebreaks }}
                     </div>
                 </div>
 
@@ -287,7 +282,28 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 <script>
+// Markdown处理
+document.addEventListener('DOMContentLoaded', function() {
+    const postContent = document.getElementById('post-content');
+    if (postContent) {
+        const content = postContent.textContent || postContent.innerText;
+        
+        // 检测是否可能是Markdown内容
+        const hasMarkdownSyntax = /#{1,6}\s|^\*\*.*\*\*|\[.*\]\(.*\)|^\* |\d+\. |```|`[^`]+`|^>\s/m.test(content);
+        
+        if (hasMarkdownSyntax && typeof marked !== 'undefined') {
+            // 如果检测到Markdown语法，使用marked.js解析
+            marked.setOptions({
+                breaks: true,
+                gfm: true
+            });
+            postContent.innerHTML = marked.parse(content);
+        }
+    }
+});
+
 // 评论相关函数
 function replyComment(commentId) {
     console.log('显示回复表单:', commentId);
