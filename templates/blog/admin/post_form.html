@@ -3,6 +3,12 @@
 
 {% block page_title %}{{ title }}{% endblock %}
 
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/admin-post-form.css' %}">
+<!-- Quill编辑器样式 -->
+<link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
+{% endblock %}
+
 {% block page_actions %}
 <a href="{% url 'blog:admin_posts' %}" class="btn btn-secondary">
     <i class="fas fa-arrow-left me-2"></i>返回列表
@@ -10,185 +16,6 @@
 {% endblock %}
 
 {% block admin_content %}
-<style>
-/* 专用于文章编辑页面的样式 */
-.article-edit-container {
-    display: grid;
-    grid-template-columns: 2fr 1fr;
-    gap: 30px;
-    max-width: 100%;
-    margin: 0;
-}
-
-.main-content {
-    min-width: 0; /* 防止内容溢出 */
-}
-
-.sidebar {
-    min-width: 300px;
-    max-width: 400px;
-}
-
-@media (max-width: 1200px) {
-    .article-edit-container {
-        grid-template-columns: 1fr;
-        gap: 20px;
-    }
-    
-    .sidebar {
-        min-width: auto;
-        max-width: none;
-    }
-}
-
-.content-card {
-    background: white;
-    border-radius: 12px;
-    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-    border: 1px solid #e5e7eb;
-    overflow: hidden;
-    margin-bottom: 20px;
-}
-
-.content-card-header {
-    padding: 20px 24px;
-    border-bottom: 1px solid #e5e7eb;
-    font-weight: 600;
-    font-size: 16px;
-    color: #1f2937;
-}
-
-.content-card-body {
-    padding: 24px;
-}
-
-.editor-header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
-
-.info-header {
-    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
-    color: white;
-}
-
-.sidebar-header {
-    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-    color: white;
-}
-
-.editor-toggle {
-    display: flex;
-    gap: 8px;
-}
-
-.editor-toggle .btn {
-    border: 1px solid rgba(255, 255, 255, 0.3);
-    color: rgba(255, 255, 255, 0.9);
-    background: transparent;
-    font-size: 14px;
-}
-
-.editor-toggle .btn.active {
-    background: rgba(255, 255, 255, 0.2);
-    color: white;
-}
-
-.form-section {
-    margin-bottom: 20px;
-}
-
-.form-section:last-child {
-    margin-bottom: 0;
-}
-
-.form-label {
-    font-weight: 600;
-    color: #374151;
-    margin-bottom: 8px;
-    display: block;
-}
-
-.form-control {
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    padding: 12px 16px;
-    font-size: 14px;
-    transition: border-color 0.2s;
-}
-
-.form-control:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-    outline: none;
-}
-
-.action-buttons {
-    display: flex;
-    gap: 12px;
-    padding: 20px 24px;
-    background: #f9fafb;
-    border-top: 1px solid #e5e7eb;
-    margin-top: 20px;
-    border-radius: 0 0 12px 12px;
-}
-
-.btn-primary {
-    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    transition: transform 0.2s;
-}
-
-.btn-primary:hover {
-    transform: translateY(-1px);
-}
-
-.btn-secondary {
-    background: #6b7280;
-    border: none;
-    padding: 12px 24px;
-    border-radius: 8px;
-    font-weight: 600;
-    color: white;
-}
-
-.sidebar .content-card {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-}
-
-.form-check {
-    margin-bottom: 12px;
-}
-
-.form-check-label {
-    font-weight: 500;
-    color: #374151;
-    margin-left: 8px;
-}
-
-/* CKEditor样式 */
-.ck.ck-editor {
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-}
-
-.ck.ck-editor__editable {
-    min-height: 400px;
-}
-
-#markdown-preview {
-    border: 2px solid #e5e7eb;
-    border-radius: 8px;
-    background: #f8fafc;
-    padding: 16px;
-    margin-top: 12px;
-}
-</style>
-
 <div class="article-edit-container">
     <!-- 主内容区域 -->
     <div class="main-content">
@@ -204,31 +31,37 @@
         <!-- 基本信息卡片 -->
         <div class="content-card">
             <div class="content-card-header info-header">
-                文章基本信息
+                <i class="fas fa-info-circle me-2"></i>文章基本信息
             </div>
             <div class="content-card-body">
                 <form method="post" enctype="multipart/form-data" id="postForm">
                     {% csrf_token %}
                     
                     <div class="form-section">
-                        <label for="title" class="form-label">文章标题 *</label>
+                        <label for="title" class="form-label">
+                            <i class="fas fa-heading me-1"></i>文章标题 *
+                        </label>
                         <input type="text" class="form-control" id="title" name="title" 
                                value="{% if post %}{{ post.title }}{% endif %}" required 
                                placeholder="请输入文章标题">
                     </div>
                     
                     <div class="form-section">
-                        <label for="summary" class="form-label">文章摘要</label>
+                        <label for="summary" class="form-label">
+                            <i class="fas fa-align-left me-1"></i>文章摘要
+                        </label>
                         <textarea class="form-control" id="summary" name="summary" rows="3" 
                                   placeholder="请输入文章摘要（可选）">{% if post %}{{ post.summary }}{% endif %}</textarea>
                     </div>
                     
                     <div class="form-section">
-                        <label for="cover_image" class="form-label">封面图片</label>
+                        <label for="cover_image" class="form-label">
+                            <i class="fas fa-image me-1"></i>封面图片
+                        </label>
                         <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
                         {% if post.cover_image %}
                             <div style="margin-top: 12px;">
-                                <img src="{{ post.cover_image }}" alt="当前封面" style="max-width: 200px; height: auto; border-radius: 8px;">
+                                <img src="{{ post.cover_image }}" alt="当前封面" style="max-width: 200px; height: auto; border-radius: 8px; border: 1px solid #e5e7eb;">
                                 <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">当前封面图片</p>
                             </div>
                         {% endif %}
@@ -241,27 +74,34 @@
         <div class="content-card">
             <div class="content-card-header editor-header">
                 <div style="display: flex; justify-content: space-between; align-items: center;">
-                    <span>文章内容 *</span>
+                    <span><i class="fas fa-edit me-2"></i>文章内容 *</span>
                     <div class="editor-toggle">
-                        <button type="button" class="btn btn-sm active" id="rich-mode-btn" onclick="switchEditorMode('rich')">
-                            富文本编辑
+                        <button type="button" class="btn active" id="rich-mode-btn" onclick="switchEditorMode('rich')">
+                            <i class="fas fa-font me-1"></i>富文本编辑
                         </button>
-                        <button type="button" class="btn btn-sm" id="markdown-mode-btn" onclick="switchEditorMode('markdown')">
-                            Markdown
+                        <button type="button" class="btn" id="markdown-mode-btn" onclick="switchEditorMode('markdown')">
+                            <i class="fab fa-markdown me-1"></i>Markdown
                         </button>
                     </div>
                 </div>
             </div>
             <div class="content-card-body">
+                <!-- Quill富文本编辑器 -->
                 <div id="editor-container">
-                    <textarea class="form-control" id="content" name="content" rows="20" form="postForm" required 
-                              placeholder="开始编写你的文章内容...">{% if post %}{{ post.content }}{% endif %}</textarea>
+                    <div id="quill-editor" style="display: block;"></div>
+                    <textarea id="content" name="content" form="postForm" style="display: none;" required>{% if post %}{{ post.content }}{% endif %}</textarea>
                 </div>
                 
-                <!-- Markdown 预览区域 -->
-                <div id="markdown-preview" style="display: none;">
-                    <h6 style="margin-bottom: 12px; color: #374151;">预览:</h6>
-                    <div id="preview-content" style="line-height: 1.6;"></div>
+                <!-- Markdown编辑器 -->
+                <div id="markdown-container" style="display: none;">
+                    <textarea class="form-control" id="markdown-input" rows="20" 
+                              placeholder="开始编写你的Markdown内容...">{% if post %}{{ post.content }}{% endif %}</textarea>
+                    
+                    <!-- Markdown 预览区域 -->
+                    <div id="markdown-preview">
+                        <h6><i class="fas fa-eye me-1"></i>预览:</h6>
+                        <div id="preview-content"></div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -281,27 +121,33 @@
     <div class="sidebar">
         <!-- 发布选项 -->
         <div class="content-card">
-            <div class="content-card-header sidebar-header">发布选项</div>
+            <div class="content-card-header sidebar-header">
+                <i class="fas fa-rocket me-2"></i>发布选项
+            </div>
             <div class="content-card-body">
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
                            form="postForm" {% if not post or post.is_published %}checked{% endif %}>
-                    <label class="form-check-label" for="is_published">发布文章</label>
+                    <label class="form-check-label" for="is_published">
+                        <i class="fas fa-globe me-1 text-success"></i>发布文章
+                    </label>
                 </div>
                 
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
                            form="postForm" {% if post.is_featured %}checked{% endif %}>
-                    <label class="form-check-label" for="is_featured">推荐文章</label>
+                    <label class="form-check-label" for="is_featured">
+                        <i class="fas fa-star me-1 text-warning"></i>推荐文章
+                    </label>
                 </div>
                 
                 <div class="form-check">
                     <input class="form-check-input" type="checkbox" id="is_vip_only" name="is_vip_only"
                            form="postForm" {% if post.is_vip_only %}checked{% endif %}>
                     <label class="form-check-label" for="is_vip_only">
-                        <i class="fas fa-crown text-warning me-1"></i>设为VIP文章
+                        <i class="fas fa-crown me-1 text-warning"></i>设为VIP文章
                     </label>
-                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px; margin-left: 20px;">
                         仅VIP用户可以阅读此文章
                     </div>
                 </div>
@@ -310,7 +156,9 @@
         
         <!-- 分类选择 -->
         <div class="content-card">
-            <div class="content-card-header sidebar-header">文章分类</div>
+            <div class="content-card-header sidebar-header">
+                <i class="fas fa-folder me-2"></i>文章分类
+            </div>
             <div class="content-card-body">
                 <select class="form-control" name="category" form="postForm">
                     <option value="">请选择分类</option>
@@ -326,7 +174,9 @@
         
         <!-- 标签选择 -->
         <div class="content-card">
-            <div class="content-card-header sidebar-header">文章标签</div>
+            <div class="content-card-header sidebar-header">
+                <i class="fas fa-tags me-2"></i>文章标签
+            </div>
             <div class="content-card-body">
                 {% for tag in tags %}
                     <div class="form-check">
@@ -334,7 +184,7 @@
                                name="tags" value="{{ tag.id }}" form="postForm"
                                {% if post and tag in post.tags.all %}checked{% endif %}>
                         <label class="form-check-label" for="tag_{{ tag.id }}">
-                            {{ tag.name }}
+                            <i class="fas fa-tag me-1"></i>{{ tag.name }}
                         </label>
                     </div>
                 {% endfor %}
@@ -342,103 +192,88 @@
         </div>
     </div>
 </div>
+{% endblock %}
 
-<!-- CKEditor 5 CDN -->
-<script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
+{% block extra_js %}
+<!-- Quill编辑器 -->
+<script src="https://cdn.quilljs.com/1.3.6/quill.min.js"></script>
 <!-- Marked.js for Markdown parsing -->
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
 <script>
 let currentEditorMode = 'rich';
-let ckEditorInstance = null;
+let quillEditor = null;
+let isQuillInitialized = false;
 
-// 初始化CKEditor
-function initCKEditor() {
-    if (ckEditorInstance) {
+// 初始化Quill编辑器
+function initQuillEditor() {
+    if (isQuillInitialized) {
         return;
     }
     
-    ClassicEditor
-        .create(document.querySelector('#content'), {
-            toolbar: {
-                items: [
-                    'heading', '|',
-                    'bold', 'italic', 'underline', 'strikethrough', '|',
-                    'link', 'bulletedList', 'numberedList', '|',
-                    'outdent', 'indent', '|',
-                    'imageUpload', 'blockQuote', 'insertTable', '|',
-                    'undo', 'redo', '|',
-                    'alignment', 'fontColor', 'fontBackgroundColor', '|',
-                    'code', 'codeBlock', 'sourceEditing'
-                ]
-            },
-            language: 'zh-cn',
-            heading: {
-                options: [
-                    { model: 'paragraph', title: '段落', class: 'ck-heading_paragraph' },
-                    { model: 'heading1', view: 'h1', title: '标题 1', class: 'ck-heading_heading1' },
-                    { model: 'heading2', view: 'h2', title: '标题 2', class: 'ck-heading_heading2' },
-                    { model: 'heading3', view: 'h3', title: '标题 3', class: 'ck-heading_heading3' }
-                ]
-            }
-        })
-        .then(editor => {
-            ckEditorInstance = editor;
-            // 设置编辑器高度
-            const editable = editor.ui.getEditableElement();
-            if (editable) {
-                editable.style.minHeight = '400px';
-            }
-        })
-        .catch(error => {
-            console.error('CKEditor初始化失败:', error);
-        });
-}
-
-// 销毁CKEditor
-function destroyCKEditor() {
-    if (ckEditorInstance) {
-        ckEditorInstance.destroy()
-            .then(() => {
-                ckEditorInstance = null;
-            })
-            .catch(error => {
-                console.error('销毁CKEditor失败:', error);
-            });
+    quillEditor = new Quill('#quill-editor', {
+        theme: 'snow',
+        modules: {
+            toolbar: [
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                ['bold', 'italic', 'underline', 'strike'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'font': [] }],
+                [{ 'align': [] }],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                ['link', 'image'],
+                ['clean']
+            ]
+        },
+        placeholder: '开始编写你的文章内容...'
+    });
+    
+    // 设置初始内容
+    const initialContent = document.getElementById('content').value;
+    if (initialContent) {
+        quillEditor.root.innerHTML = initialContent;
     }
+    
+    // 监听内容变化
+    quillEditor.on('text-change', function() {
+        document.getElementById('content').value = quillEditor.root.innerHTML;
+    });
+    
+    isQuillInitialized = true;
+    console.log('Quill编辑器初始化完成');
 }
 
 // 初始化Markdown编辑器
 function initMarkdownEditor() {
-    const textarea = document.getElementById('content');
-    const previewDiv = document.getElementById('markdown-preview');
+    const markdownInput = document.getElementById('markdown-input');
+    const previewContent = document.getElementById('preview-content');
     
-    previewDiv.style.display = 'block';
-    textarea.style.fontFamily = '"Courier New", monospace';
-    textarea.style.fontSize = '14px';
+    // 设置初始内容
+    const currentContent = document.getElementById('content').value;
+    if (currentContent) {
+        markdownInput.value = currentContent;
+    }
     
     // 监听输入变化
-    textarea.addEventListener('input', updateMarkdownPreview);
-    updateMarkdownPreview();
-}
-
-// 清理Markdown编辑器
-function cleanupMarkdownEditor() {
-    const previewDiv = document.getElementById('markdown-preview');
-    const textarea = document.getElementById('content');
+    markdownInput.addEventListener('input', function() {
+        updateMarkdownPreview();
+        document.getElementById('content').value = markdownInput.value;
+    });
     
-    previewDiv.style.display = 'none';
-    textarea.style.fontFamily = '';
-    textarea.style.fontSize = '';
+    // 初始预览
+    updateMarkdownPreview();
+    console.log('Markdown编辑器初始化完成');
 }
 
 // 更新Markdown预览
 function updateMarkdownPreview() {
-    const textarea = document.getElementById('content');
+    const markdownInput = document.getElementById('markdown-input');
     const previewContent = document.getElementById('preview-content');
     
-    if (textarea && previewContent) {
-        const markdownText = textarea.value;
+    if (markdownInput && previewContent) {
+        const markdownText = markdownInput.value;
         const htmlContent = marked.parse(markdownText);
         previewContent.innerHTML = htmlContent;
     }
@@ -448,23 +283,49 @@ function updateMarkdownPreview() {
 function switchEditorMode(mode) {
     const richBtn = document.getElementById('rich-mode-btn');
     const markdownBtn = document.getElementById('markdown-mode-btn');
+    const editorContainer = document.getElementById('editor-container');
+    const markdownContainer = document.getElementById('markdown-container');
+    
+    // 保存当前内容
+    let currentContent = '';
+    if (currentEditorMode === 'rich' && quillEditor) {
+        currentContent = quillEditor.root.innerHTML;
+    } else if (currentEditorMode === 'markdown') {
+        currentContent = document.getElementById('markdown-input').value;
+    }
     
     if (mode === 'rich') {
         currentEditorMode = 'rich';
         richBtn.classList.add('active');
         markdownBtn.classList.remove('active');
         
-        cleanupMarkdownEditor();
+        editorContainer.style.display = 'block';
+        markdownContainer.style.display = 'none';
+        
+        // 初始化Quill编辑器
         setTimeout(() => {
-            initCKEditor();
+            initQuillEditor();
+            if (currentContent && quillEditor) {
+                quillEditor.root.innerHTML = currentContent;
+                document.getElementById('content').value = currentContent;
+            }
         }, 100);
+        
     } else {
         currentEditorMode = 'markdown';
         markdownBtn.classList.add('active');
         richBtn.classList.remove('active');
         
-        destroyCKEditor();
+        editorContainer.style.display = 'none';
+        markdownContainer.style.display = 'block';
+        
+        // 初始化Markdown编辑器
         setTimeout(() => {
+            const markdownInput = document.getElementById('markdown-input');
+            if (currentContent) {
+                markdownInput.value = currentContent;
+                document.getElementById('content').value = currentContent;
+            }
             initMarkdownEditor();
         }, 100);
     }
@@ -475,14 +336,18 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
     const title = document.getElementById('title').value.trim();
     let content = '';
     
-    if (currentEditorMode === 'rich' && ckEditorInstance) {
-        content = ckEditorInstance.getData().trim();
-        document.getElementById('content').value = ckEditorInstance.getData();
-    } else {
-        content = document.getElementById('content').value.trim();
+    if (currentEditorMode === 'rich' && quillEditor) {
+        content = quillEditor.root.innerHTML.trim();
+        document.getElementById('content').value = content;
+    } else if (currentEditorMode === 'markdown') {
+        content = document.getElementById('markdown-input').value.trim();
+        document.getElementById('content').value = content;
     }
     
-    if (!title || !content) {
+    // 检查内容是否为空（排除只有HTML标签的情况）
+    const textContent = content.replace(/<[^>]*>/g, '').trim();
+    
+    if (!title || !textContent) {
         e.preventDefault();
         alert('标题和内容不能为空');
         return false;
@@ -491,7 +356,8 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
 
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
-    initCKEditor();
+    console.log('页面加载完成，初始化编辑器');
+    initQuillEditor();
 });
 </script>
 {% endblock %}
