@@ -1399,3 +1399,54 @@ footer {
     line-height: 1.5;
     resize: vertical;
 }
+
+/* 文章编辑页面布局优化 */
+.post-editor-section {
+    margin-bottom: 2rem;
+}
+
+.editor-card .card-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.editor-card .card-header h6 {
+    color: white !important;
+}
+
+.basic-info-card .card-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+    border-bottom: none;
+}
+
+.basic-info-card .card-header h6 {
+    color: white !important;
+}
+
+/* 编辑器模式切换按钮样式 */
+.editor-mode-toggle .btn-outline-primary {
+    border-color: rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+}
+
+.editor-mode-toggle .btn-outline-primary:hover {
+    background-color: rgba(255, 255, 255, 0.2);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+.editor-mode-toggle .btn-check:checked + .btn-outline-primary {
+    background-color: rgba(255, 255, 255, 0.3);
+    border-color: rgba(255, 255, 255, 0.5);
+    color: white;
+}
+
+/* 操作按钮区域 */
+.action-buttons {
+    background: #f8f9fa;
+    border-radius: 8px;
+    padding: 1rem;
+    border: 1px solid #e9ecef;
+}
