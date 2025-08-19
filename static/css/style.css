@@ -1464,3 +1464,63 @@ footer {
     padding: 1rem;
     border: 1px solid #e9ecef;
 }
+
+/* 强制修复文章编辑页面布局 */
+.post-edit-layout {
+    display: flex !important;
+    flex-wrap: wrap !important;
+    margin: 0 -15px !important;
+}
+
+.post-edit-layout .col-lg-8 {
+    flex: 0 0 66.666667% !important;
+    max-width: 66.666667% !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+}
+
+.post-edit-layout .col-lg-4 {
+    flex: 0 0 33.333333% !important;
+    max-width: 33.333333% !important;
+    padding: 0 15px !important;
+    box-sizing: border-box !important;
+}
+
+/* 确保在较小屏幕上正确响应 */
+@media (max-width: 991.98px) {
+    .post-edit-layout .col-lg-8,
+    .post-edit-layout .col-lg-4 {
+        flex: 0 0 100% !important;
+        max-width: 100% !important;
+    }
+}
+
+/* 右侧边栏样式 */
+.post-edit-layout .col-lg-4 {
+    border-left: 2px solid #e9ecef;
+    background: #f8f9fa;
+    border-radius: 0 8px 8px 0;
+    min-height: 100vh;
+}
+
+.post-edit-layout .col-lg-4 .card {
+    background: white;
+    border: 1px solid #e0e0e0;
+}
+
+.post-edit-layout .col-lg-4 .card-header {
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%) !important;
+    color: white !important;
+    border-bottom: none !important;
+}
+
+.post-edit-layout .col-lg-4 .card-header h6 {
+    color: white !important;
+    font-weight: 600 !important;
+}
+
+/* 主内容区域样式 */
+.post-edit-layout .col-lg-8 {
+    background: white;
+    padding-right: 30px !important;
+}
