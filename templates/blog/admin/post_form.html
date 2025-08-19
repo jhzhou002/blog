@@ -166,82 +166,149 @@
     </div>
 </div>
 
-<!-- TinyMCE CDN -->
-<script src="https://cdn.tiny.cloud/1/0fk8icizotjq1f5s7wy4vpjkmx6kg30bgvedf1vtg7avkc7t/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- CKEditor 5 CDN -->
+<script src="https://cdn.ckeditor.com/ckeditor5/40.2.0/classic/ckeditor.js"></script>
 <!-- Marked.js for Markdown parsing -->
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
 <script>
 let currentEditorMode = 'rich'; // 'rich' or 'markdown'
-let tinyMCEInstance = null;
+let ckEditorInstance = null;
 
-// 初始化TinyMCE富文本编辑器
-function initTinyMCE() {
-    if (tinyMCEInstance) {
+// 初始化CKEditor富文本编辑器
+function initCKEditor() {
+    if (ckEditorInstance) {
         return; // 已经初始化
     }
     
-    tinymce.init({
-        selector: '#content',
-        height: 500,
-        menubar: 'file edit view insert format tools table help',
-        plugins: [
-            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
-            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
-            'insertdatetime', 'media', 'table', 'help', 'wordcount'
-        ],
-        toolbar: 'undo redo | blocks | ' +
-            'bold italic forecolor | alignleft aligncenter ' +
-            'alignright alignjustify | bullist numlist outdent indent | ' +
-            'removeformat | help | fullscreen | code',
-        content_style: 'body { font-family:Arial,sans-serif; font-size:14px }',
-        language: 'zh_CN',
-        branding: false,
-        resize: true,
-        // 添加图片上传功能配置
-        images_upload_url: false, // 禁用默认图片上传
-        // 自定义图片上传处理
-        images_upload_handler: function (blobInfo, success, failure) {
-            console.log('图片上传暂未配置');
-            failure('图片上传功能暂未配置');
-        },
-        // 自定义样式
-        content_css: [
-            '{% static "css/style.css" %}'
-        ],
-        // 支持HTML5
-        extended_valid_elements: 'script[src|async|defer|type|charset]',
-        // 代码高亮相关
-        codesample_languages: [
-            {text: 'HTML/XML', value: 'markup'},
-            {text: 'JavaScript', value: 'javascript'},
-            {text: 'CSS', value: 'css'},
-            {text: 'Python', value: 'python'},
-            {text: 'Java', value: 'java'},
-            {text: 'C++', value: 'cpp'},
-            {text: 'C#', value: 'csharp'},
-            {text: 'SQL', value: 'sql'},
-            {text: 'JSON', value: 'json'}
-        ],
-        // 表格样式
-        table_default_attributes: {
-            'class': 'table table-bordered'
-        },
-        // 段落格式
-        block_formats: '段落=p; 标题1=h1; 标题2=h2; 标题3=h3; 标题4=h4; 标题5=h5; 标题6=h6; 预格式=pre',
-        // 初始化完成回调
-        init_instance_callback: function (editor) {
-            console.log('TinyMCE编辑器初始化完成');
-            tinyMCEInstance = editor;
-        }
-    });
+    ClassicEditor
+        .create(document.querySelector('#content'), {
+            toolbar: {
+                items: [
+                    'heading',
+                    '|',
+                    'bold',
+                    'italic',
+                    'underline',
+                    'strikethrough',
+                    'link',
+                    'bulletedList',
+                    'numberedList',
+                    '|',
+                    'outdent',
+                    'indent',
+                    '|',
+                    'imageUpload',
+                    'blockQuote',
+                    'insertTable',
+                    'mediaEmbed',
+                    '|',
+                    'undo',
+                    'redo',
+                    'alignment',
+                    'fontColor',
+                    'fontBackgroundColor',
+                    'fontSize',
+                    'fontFamily',
+                    '|',
+                    'code',
+                    'codeBlock',
+                    'sourceEditing'
+                ]
+            },
+            language: 'zh-cn',
+            image: {
+                toolbar: [
+                    'imageTextAlternative',
+                    'imageStyle:inline',
+                    'imageStyle:block',
+                    'imageStyle:side'
+                ]
+            },
+            table: {
+                contentToolbar: [
+                    'tableColumn',
+                    'tableRow',
+                    'mergeTableCells',
+                    'tableCellProperties',
+                    'tableProperties'
+                ]
+            },
+            heading: {
+                options: [
+                    { model: 'paragraph', title: '段落', class: 'ck-heading_paragraph' },
+                    { model: 'heading1', view: 'h1', title: '标题 1', class: 'ck-heading_heading1' },
+                    { model: 'heading2', view: 'h2', title: '标题 2', class: 'ck-heading_heading2' },
+                    { model: 'heading3', view: 'h3', title: '标题 3', class: 'ck-heading_heading3' },
+                    { model: 'heading4', view: 'h4', title: '标题 4', class: 'ck-heading_heading4' },
+                    { model: 'heading5', view: 'h5', title: '标题 5', class: 'ck-heading_heading5' },
+                    { model: 'heading6', view: 'h6', title: '标题 6', class: 'ck-heading_heading6' }
+                ]
+            },
+            fontSize: {
+                options: [
+                    9,
+                    11,
+                    13,
+                    'default',
+                    17,
+                    19,
+                    21
+                ]
+            },
+            fontFamily: {
+                options: [
+                    'default',
+                    'Arial, Helvetica, sans-serif',
+                    'Courier New, Courier, monospace',
+                    'Georgia, serif',
+                    'Lucida Sans Unicode, Lucida Grande, sans-serif',
+                    'Tahoma, Geneva, sans-serif',
+                    'Times New Roman, Times, serif',
+                    'Trebuchet MS, Helvetica, sans-serif',
+                    'Verdana, Geneva, sans-serif',
+                    'Microsoft YaHei, 微软雅黑, sans-serif',
+                    'SimSun, 宋体, serif',
+                    'SimHei, 黑体, sans-serif'
+                ]
+            },
+            alignment: {
+                options: ['left', 'center', 'right', 'justify']
+            },
+            // 禁用图片上传功能
+            simpleUpload: {
+                uploadUrl: '#',
+                withCredentials: false,
+                headers: {
+                    'X-CSRF-TOKEN': 'CSRF-Token'
+                }
+            }
+        })
+        .then(editor => {
+            console.log('CKEditor编辑器初始化完成');
+            ckEditorInstance = editor;
+            
+            // 设置编辑器高度
+            editor.editing.view.change(writer => {
+                writer.setStyle('height', '500px', editor.editing.view.document.getRoot());
+            });
+        })
+        .catch(error => {
+            console.error('CKEditor初始化失败:', error);
+        });
 }
 
-// 销毁TinyMCE编辑器
-function destroyTinyMCE() {
-    if (tinyMCEInstance) {
-        tinymce.remove('#content');
-        tinyMCEInstance = null;
+// 销毁CKEditor编辑器
+function destroyCKEditor() {
+    if (ckEditorInstance) {
+        ckEditorInstance.destroy()
+            .then(() => {
+                console.log('CKEditor编辑器已销毁');
+                ckEditorInstance = null;
+            })
+            .catch(error => {
+                console.error('销毁CKEditor编辑器失败:', error);
+            });
     }
 }
 
@@ -365,14 +432,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const markdownEditorRadio = document.getElementById('markdown-editor');
     
     // 默认初始化富文本编辑器
-    initTinyMCE();
+    initCKEditor();
     
     richEditorRadio.addEventListener('change', function() {
         if (this.checked) {
             currentEditorMode = 'rich';
             cleanupMarkdownEditor();
             setTimeout(() => {
-                initTinyMCE();
+                initCKEditor();
             }, 100);
         }
     });
@@ -380,7 +447,7 @@ document.addEventListener('DOMContentLoaded', function() {
     markdownEditorRadio.addEventListener('change', function() {
         if (this.checked) {
             currentEditorMode = 'markdown';
-            destroyTinyMCE();
+            destroyCKEditor();
             setTimeout(() => {
                 initMarkdownEditor();
             }, 100);
@@ -393,11 +460,12 @@ document.querySelector('form').addEventListener('submit', function(e) {
     const title = document.getElementById('title').value.trim();
     let content = '';
     
-    if (currentEditorMode === 'rich' && tinyMCEInstance) {
-        // 获取TinyMCE编辑器内容
-        content = tinyMCEInstance.getContent().trim();
-        // 确保TinyMCE内容同步到textarea
-        tinymce.triggerSave();
+    if (currentEditorMode === 'rich' && ckEditorInstance) {
+        // 获取CKEditor编辑器内容
+        content = ckEditorInstance.getData().trim();
+        
+        // 将CKEditor内容同步到textarea
+        document.getElementById('content').value = ckEditorInstance.getData();
     } else {
         // 获取普通textarea内容
         content = document.getElementById('content').value.trim();
