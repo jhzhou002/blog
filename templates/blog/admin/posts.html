@@ -123,93 +123,117 @@
     </div>
 </div>
 
-<!-- 文章卡片网格 -->
+<!-- 文章列表 - 单列圆角矩形卡片 -->
 {% if posts %}
-<div class="row">
+<div class="posts-list">
     {% for post in posts %}
-    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
-        <div class="admin-card animate-fade-in">
-            <div class="admin-card-header">
-                <div class="d-flex align-items-center gap-md">
+    <div class="admin-card mb-3 animate-fade-in post-list-item">
+        <div class="admin-card-body">
+            <div class="d-flex align-items-start gap-3">
+                <!-- 选择框 -->
+                <div class="flex-shrink-0 mt-1">
                     <input type="checkbox" class="form-check-input-admin post-checkbox" value="{{ post.id }}" 
                            onchange="updateBulkActions()">
-                    <div class="flex-fill">
-                        <h6 class="mb-2 text-truncate">
-                            <a href="{{ post.get_absolute_url }}" target="_blank" class="text-decoration-none">
-                                {{ post.title|truncatechars:50 }}
-                            </a>
-                        </h6>
-                        <div class="d-flex gap-sm flex-wrap">
-                            <span class="badge-admin gray">
-                                <i class="fas fa-user"></i>{{ post.author.username }}
-                            </span>
-                            <span class="badge-admin gray">
-                                <i class="fas fa-calendar"></i>{{ post.created_at|date:"m-d" }}
-                            </span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="admin-card-body">
-                <!-- 状态徽章 -->
-                <div class="d-flex gap-sm flex-wrap mb-3">
-                    {% if post.category %}
-                        <span class="badge-admin info">
-                            <i class="fas fa-folder"></i>{{ post.category.name }}
-                        </span>
-                    {% endif %}
-                    {% if post.is_published %}
-                        <span class="badge-admin success">
-                            <i class="fas fa-check"></i>已发布
-                        </span>
-                    {% else %}
-                        <span class="badge-admin gray">
-                            <i class="fas fa-edit"></i>草稿
-                        </span>
-                    {% endif %}
-                    {% if post.is_featured %}
-                        <span class="badge-admin warning">
-                            <i class="fas fa-star"></i>推荐
-                        </span>
-                    {% endif %}
-                    {% if post.is_vip_only %}
-                        <span class="badge-admin warning">
-                            <i class="fas fa-crown"></i>VIP
-                        </span>
-                    {% endif %}
                 </div>
                 
-                <!-- 统计数据 -->
-                <div class="row text-center mb-3">
-                    <div class="col-4">
-                        <div class="stat-number">{{ post.views }}</div>
-                        <div class="stat-label">浏览</div>
+                <!-- 文章信息 -->
+                <div class="flex-fill">
+                    <div class="row">
+                        <!-- 左侧：标题和信息 -->
+                        <div class="col-lg-8">
+                            <h5 class="mb-2">
+                                <a href="{{ post.get_absolute_url }}" target="_blank" class="text-decoration-none text-dark">
+                                    {{ post.title }}
+                                </a>
+                            </h5>
+                            
+                            <!-- 摘要 -->
+                            {% if post.summary %}
+                            <p class="text-muted mb-2" style="font-size: 0.9rem;">
+                                {{ post.summary|truncatechars:120 }}
+                            </p>
+                            {% endif %}
+                            
+                            <!-- 元信息 -->
+                            <div class="d-flex gap-3 flex-wrap mb-2">
+                                <small class="text-muted">
+                                    <i class="fas fa-user"></i> {{ post.author.username }}
+                                </small>
+                                <small class="text-muted">
+                                    <i class="fas fa-calendar"></i> {{ post.created_at|date:"Y-m-d H:i" }}
+                                </small>
+                                {% if post.updated_at != post.created_at %}
+                                <small class="text-muted">
+                                    <i class="fas fa-edit"></i> 更新于 {{ post.updated_at|date:"m-d H:i" }}
+                                </small>
+                                {% endif %}
+                            </div>
+                            
+                            <!-- 状态徽章 -->
+                            <div class="d-flex gap-2 flex-wrap">
+                                {% if post.category %}
+                                    <span class="badge-admin info">
+                                        <i class="fas fa-folder"></i>{{ post.category.name }}
+                                    </span>
+                                {% endif %}
+                                {% if post.is_published %}
+                                    <span class="badge-admin success">
+                                        <i class="fas fa-check"></i>已发布
+                                    </span>
+                                {% else %}
+                                    <span class="badge-admin gray">
+                                        <i class="fas fa-edit"></i>草稿
+                                    </span>
+                                {% endif %}
+                                {% if post.is_featured %}
+                                    <span class="badge-admin warning">
+                                        <i class="fas fa-star"></i>推荐
+                                    </span>
+                                {% endif %}
+                                {% if post.is_vip_only %}
+                                    <span class="badge-admin warning">
+                                        <i class="fas fa-crown"></i>VIP
+                                    </span>
+                                {% endif %}
+                            </div>
+                        </div>
+                        
+                        <!-- 右侧：统计和操作 -->
+                        <div class="col-lg-4">
+                            <!-- 统计数据 -->
+                            <div class="d-flex justify-content-end gap-4 mb-3">
+                                <div class="text-center">
+                                    <div class="fw-bold text-primary">{{ post.views }}</div>
+                                    <small class="text-muted">浏览</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="fw-bold text-success">{{ post.likes }}</div>
+                                    <small class="text-muted">点赞</small>
+                                </div>
+                                <div class="text-center">
+                                    <div class="fw-bold text-info">{{ post.comment_count }}</div>
+                                    <small class="text-muted">评论</small>
+                                </div>
+                            </div>
+                            
+                            <!-- 操作按钮 -->
+                            <div class="d-flex gap-2 justify-content-end">
+                                <a href="{{ post.get_absolute_url }}" target="_blank" 
+                                   class="btn-admin info small" title="查看文章">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{% url 'blog:admin_post_edit' post.pk %}" 
+                                   class="btn-admin success small" title="编辑文章">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{% url 'blog:admin_post_delete' post.pk %}" 
+                                   class="btn-admin danger small" title="删除文章"
+                                   onclick="return confirm('确定要删除这篇文章吗？')">
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </div>
                     </div>
-                    <div class="col-4">
-                        <div class="stat-number">{{ post.likes }}</div>
-                        <div class="stat-label">点赞</div>
-                    </div>
-                    <div class="col-4">
-                        <div class="stat-number">{{ post.comment_count }}</div>
-                        <div class="stat-label">评论</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="admin-card-footer">
-                <div class="d-flex gap-sm justify-content-center w-100">
-                    <a href="{{ post.get_absolute_url }}" target="_blank" class="btn-admin info small">
-                        <i class="fas fa-eye"></i>查看
-                    </a>
-                    <a href="{% url 'blog:admin_post_edit' post.pk %}" class="btn-admin success small">
-                        <i class="fas fa-edit"></i>编辑
-                    </a>
-                    <a href="{% url 'blog:admin_post_delete' post.pk %}" 
-                       class="btn-admin danger small" 
-                       onclick="return confirm('确定要删除这篇文章吗？')">
-                        <i class="fas fa-trash"></i>删除
-                    </a>
                 </div>
             </div>
         </div>

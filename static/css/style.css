@@ -1,5 +1,136 @@
 /* Custom styles for MyBlog */
 
+/* Markdown Content Styles */
+.post-body h1,
+.post-body h2,
+.post-body h3,
+.post-body h4,
+.post-body h5,
+.post-body h6 {
+    margin-top: 2rem;
+    margin-bottom: 1rem;
+    font-weight: 600;
+    line-height: 1.25;
+}
+
+.post-body h1 { 
+    font-size: 2rem;
+    border-bottom: 2px solid var(--primary-color);
+    padding-bottom: 0.5rem;
+}
+
+.post-body h2 {
+    font-size: 1.5rem;
+    color: var(--primary-color);
+}
+
+.post-body h3 {
+    font-size: 1.25rem;
+    color: var(--secondary-color);
+}
+
+.post-body code {
+    background-color: #f8f9fa;
+    color: #e83e8c;
+    padding: 0.2rem 0.4rem;
+    border-radius: 0.25rem;
+    font-size: 0.875em;
+}
+
+.post-body pre {
+    background-color: #f8f9fa;
+    border: 1px solid #dee2e6;
+    border-radius: 0.375rem;
+    padding: 1rem;
+    overflow-x: auto;
+    margin: 1rem 0;
+}
+
+.post-body pre code {
+    background: transparent;
+    color: inherit;
+    padding: 0;
+    font-size: 0.9em;
+}
+
+.post-body blockquote {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 1rem;
+    margin: 1.5rem 0;
+    background-color: rgba(13, 110, 253, 0.03);
+    padding: 1rem;
+    border-radius: 0 0.375rem 0.375rem 0;
+}
+
+.post-body ul,
+.post-body ol {
+    padding-left: 2rem;
+    margin-bottom: 1rem;
+}
+
+.post-body li {
+    margin-bottom: 0.5rem;
+}
+
+.post-body a {
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+.post-body a:hover {
+    text-decoration: underline;
+}
+
+.post-body img {
+    max-width: 100%;
+    height: auto;
+    border-radius: 0.375rem;
+    margin: 1rem 0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.post-body hr {
+    border: none;
+    height: 1px;
+    background: linear-gradient(to right, transparent, var(--primary-color), transparent);
+    margin: 2rem 0;
+}
+
+.post-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1rem 0;
+    background-color: white;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    border-radius: 0.375rem;
+    overflow: hidden;
+}
+
+.post-body th,
+.post-body td {
+    border: 1px solid #dee2e6;
+    padding: 0.75rem;
+    text-align: left;
+}
+
+.post-body th {
+    background-color: var(--light-color);
+    font-weight: 600;
+}
+
+.post-body strong {
+    color: var(--dark-color);
+}
+
+.post-body em {
+    color: var(--secondary-color);
+}
+
+.post-body del {
+    color: var(--secondary-color);
+    opacity: 0.7;
+}
+
 :root {
     --primary-color: #0d6efd;
     --secondary-color: #6c757d;

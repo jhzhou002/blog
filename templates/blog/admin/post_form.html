@@ -253,8 +253,11 @@ function initQuillEditor() {
     
     // 设置初始内容
     const initialContent = document.getElementById('content').value;
-    if (initialContent) {
+    console.log('初始内容:', initialContent);
+    if (initialContent && initialContent.trim() !== '') {
+        // 对于HTML内容，直接设置到编辑器
         quillEditor.root.innerHTML = initialContent;
+        console.log('已设置初始内容到Quill编辑器');
     }
     
     // 监听内容变化
@@ -273,8 +276,10 @@ function initMarkdownEditor() {
     
     // 设置初始内容
     const currentContent = document.getElementById('content').value;
-    if (currentContent) {
+    console.log('Markdown初始内容:', currentContent);
+    if (currentContent && currentContent.trim() !== '') {
         markdownInput.value = currentContent;
+        console.log('已设置初始内容到Markdown编辑器');
     }
     
     // 监听输入变化
@@ -382,7 +387,13 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
 // 页面加载完成后初始化
 document.addEventListener('DOMContentLoaded', function() {
     console.log('页面加载完成，初始化编辑器');
-    initQuillEditor();
+    
+    // 等待一小段时间确保DOM完全渲染
+    setTimeout(() => {
+        const contentField = document.getElementById('content');
+        console.log('Content字段值:', contentField ? contentField.value : '字段不存在');
+        initQuillEditor();
+    }, 100);
 });
 </script>
 {% endblock %}
