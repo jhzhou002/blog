@@ -1,0 +1,437 @@
+/* 管理后台基础布局样式 - 确保左侧导航固定 */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* 全局样式重置 */
+* {
+    box-sizing: border-box;
+}
+
+body {
+    font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    background-color: #f1f5f9;
+    color: #475569;
+    font-weight: 400;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+}
+
+/* 主要布局容器 */
+#wrapper {
+    display: flex;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+}
+
+/* 固定侧边栏 */
+.sidebar {
+    width: 280px;
+    min-height: 100vh;
+    position: fixed;
+    left: 0;
+    top: 0;
+    z-index: 1000;
+    background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+    border-right: 1px solid #e2e8f0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* 侧边栏品牌区域 */
+.sidebar .sidebar-brand {
+    height: 80px;
+    text-decoration: none;
+    font-size: 1.25rem;
+    font-weight: 700;
+    padding: 1.5rem;
+    color: #1e293b;
+    border-bottom: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.sidebar .sidebar-brand .sidebar-brand-icon i {
+    font-size: 1.5rem;
+    margin-right: 0.75rem;
+    color: white;
+}
+
+.sidebar .sidebar-brand .sidebar-brand-text {
+    color: white;
+    font-weight: 700;
+}
+
+/* 侧边栏导航 */
+.sidebar-heading {
+    padding: 1.5rem 1.5rem 0.5rem;
+    font-weight: 600;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+    margin-top: 1rem;
+}
+
+.sidebar .sidebar-divider {
+    margin: 1rem 1.5rem;
+    border-top: 1px solid #e2e8f0;
+}
+
+.sidebar .nav-item {
+    position: relative;
+    margin-bottom: 4px;
+}
+
+.sidebar .nav-item .nav-link {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    color: #64748b;
+    text-decoration: none;
+    border-radius: 12px;
+    transition: all 0.3s ease;
+    position: relative;
+    margin: 0 12px;
+    font-weight: 500;
+}
+
+.sidebar .nav-item .nav-link i {
+    width: 20px;
+    margin-right: 12px;
+    font-size: 1rem;
+    transition: all 0.3s ease;
+}
+
+.sidebar .nav-item .nav-link:hover {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(147, 197, 253, 0.1) 100%);
+    color: #3b82f6;
+    transform: translateX(2px);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.15);
+}
+
+.sidebar .nav-item.active .nav-link,
+.sidebar .nav-item .nav-link.active {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    color: white;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25);
+}
+
+.sidebar .nav-item.active .nav-link i,
+.sidebar .nav-item .nav-link.active i {
+    color: white;
+}
+
+/* 折叠菜单样式 */
+.sidebar .collapse {
+    margin: 0 12px;
+    border-radius: 12px;
+    overflow: hidden;
+    background: rgba(248, 250, 252, 0.5);
+}
+
+.sidebar .collapse .collapse-inner {
+    background: transparent;
+    padding: 8px 0;
+}
+
+.sidebar .collapse .collapse-item {
+    display: block;
+    padding: 12px 20px 12px 48px;
+    color: #64748b;
+    text-decoration: none;
+    font-size: 0.9rem;
+    transition: all 0.2s ease;
+    border-radius: 8px;
+    margin: 2px 8px;
+    font-weight: 500;
+}
+
+.sidebar .collapse .collapse-item:hover {
+    background-color: rgba(59, 130, 246, 0.08);
+    color: #3b82f6;
+    transform: translateX(4px);
+}
+
+.sidebar .collapse .collapse-item.active {
+    background: linear-gradient(135deg, rgba(59, 130, 246, 0.15) 0%, rgba(147, 197, 253, 0.15) 100%);
+    color: #3b82f6;
+    font-weight: 600;
+    border-left: 3px solid #3b82f6;
+}
+
+/* 侧边栏用户信息 */
+.sidebar-user-profile {
+    position: sticky;
+    bottom: 0;
+    background: linear-gradient(135deg, #1e293b 0%, #334155 100%);
+    margin: 1rem;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.sidebar-user-profile .dropdown-menu {
+    border: none;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+    border-radius: 12px;
+    margin-top: 8px;
+}
+
+/* 侧边栏切换按钮 */
+#sidebarToggle {
+    background-color: rgba(59, 130, 246, 0.1);
+    border: 2px solid rgba(59, 130, 246, 0.2);
+    color: #3b82f6;
+    width: 40px;
+    height: 40px;
+    margin: 1rem auto;
+    transition: all 0.3s ease;
+}
+
+#sidebarToggle:hover {
+    background-color: #3b82f6;
+    color: white;
+    transform: scale(1.1);
+}
+
+/* 主内容区域 */
+#content-wrapper {
+    flex: 1;
+    margin-left: 280px;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    background-color: #f1f5f9;
+}
+
+/* 顶部导航栏 */
+.topbar {
+    height: 80px;
+    background: white;
+    border-bottom: 1px solid #e2e8f0;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    padding: 0 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 999;
+}
+
+.topbar h1 {
+    color: #1e293b;
+    font-weight: 700;
+    font-size: 1.75rem;
+    margin: 0;
+}
+
+/* 主内容容器 */
+#content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.container-fluid {
+    padding: 2rem;
+    flex: 1;
+    max-width: none;
+}
+
+/* 页面操作按钮 */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    padding: 10px 20px;
+    border: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    box-shadow: 0 2px 8px rgba(59, 130, 246, 0.25);
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(59, 130, 246, 0.35);
+}
+
+.btn-secondary {
+    background-color: #64748b;
+    color: white;
+}
+
+.btn-secondary:hover {
+    background-color: #475569;
+    color: white;
+}
+
+/* 页脚 */
+.sticky-footer {
+    background-color: white;
+    border-top: 1px solid #e2e8f0;
+    padding: 1.5rem 0;
+    margin-top: auto;
+}
+
+.sticky-footer .copyright {
+    color: #64748b;
+    font-size: 0.875rem;
+}
+
+/* 侧边栏折叠状态 */
+body.sidebar-toggled .sidebar {
+    width: 80px;
+}
+
+body.sidebar-toggled #content-wrapper {
+    margin-left: 80px;
+}
+
+body.sidebar-toggled .sidebar .sidebar-brand .sidebar-brand-text,
+body.sidebar-toggled .sidebar .nav-item .nav-link span,
+body.sidebar-toggled .sidebar-heading {
+    display: none;
+}
+
+body.sidebar-toggled .sidebar .nav-item .nav-link {
+    justify-content: center;
+    padding: 1rem;
+}
+
+body.sidebar-toggled .sidebar .nav-item .nav-link i {
+    margin-right: 0;
+}
+
+body.sidebar-toggled .sidebar .collapse {
+    display: none;
+}
+
+body.sidebar-toggled .sidebar-user-profile {
+    display: none;
+}
+
+/* 响应式设计 */
+@media (max-width: 768px) {
+    .sidebar {
+        transform: translateX(-280px);
+    }
+    
+    #content-wrapper {
+        margin-left: 0;
+        width: 100%;
+    }
+    
+    body.sidebar-toggled .sidebar {
+        transform: translateX(0);
+        width: 280px;
+    }
+    
+    .topbar {
+        padding: 0 1rem;
+    }
+    
+    .topbar h1 {
+        font-size: 1.5rem;
+    }
+    
+    .container-fluid {
+        padding: 1rem;
+    }
+}
+
+/* 移动端顶部切换按钮 */
+#sidebarToggleTop {
+    background: none;
+    border: none;
+    color: #64748b;
+    font-size: 1.25rem;
+    padding: 8px;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+#sidebarToggleTop:hover {
+    background-color: rgba(59, 130, 246, 0.1);
+    color: #3b82f6;
+}
+
+/* 确保内容不被侧边栏遮挡 */
+@media (min-width: 769px) {
+    .sidebar {
+        position: fixed;
+        left: 0;
+    }
+    
+    #content-wrapper {
+        margin-left: 280px;
+    }
+}
+
+/* 滚动条样式 */
+.sidebar::-webkit-scrollbar {
+    width: 6px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.5);
+}
+
+/* 动画效果 */
+.nav-item .nav-link,
+.collapse-item {
+    position: relative;
+    overflow: hidden;
+}
+
+.nav-item .nav-link::before,
+.collapse-item::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+    transition: left 0.5s;
+}
+
+.nav-item .nav-link:hover::before,
+.collapse-item:hover::before {
+    left: 100%;
+}
+
+/* 页面加载动画 */
+.fade-in {
+    animation: fadeIn 0.5s ease-in-out;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
