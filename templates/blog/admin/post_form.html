@@ -258,12 +258,16 @@ function initQuillEditor() {
     console.log('初始内容:', initialContent);
     console.log('内容长度:', initialContent.length);
     
-    if (initialContent && initialContent.trim() !== '') {
-        // 对于HTML内容，直接设置到编辑器
-        quillEditor.root.innerHTML = initialContent;
-        console.log('已设置初始内容到Quill编辑器');
-        // 确保隐藏字段也有内容
-        contentField.value = initialContent;
+    if (initialContent && initialContent.trim() !== '' && initialContent.trim() !== '<p><br></p>') {
+        // 清理空的HTML标签，设置实际内容
+        const cleanContent = initialContent.replace(/^<p><br><\/p>$/g, '').trim();
+        if (cleanContent !== '') {
+            quillEditor.root.innerHTML = initialContent;
+            console.log('已设置初始内容到Quill编辑器');
+            contentField.value = initialContent;
+        } else {
+            console.log('内容为空的HTML标签，忽略');
+        }
     } else {
         console.log('没有初始内容或内容为空');
     }

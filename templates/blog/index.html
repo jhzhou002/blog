@@ -88,76 +88,72 @@
             <div class="posts-section">
                 {% for post in posts %}
                 <article class="post-card">
-                    <div class="post-card-content">
-                        <!-- 封面图 -->
-                        <div class="post-card-img-wrapper">
-                            <a href="{{ post.get_absolute_url }}">
+                    <a href="{{ post.get_absolute_url }}" class="post-card-link">
+                        <div class="post-card-content">
+                            <!-- 封面图 -->
+                            <div class="post-card-img-wrapper">
                                 {% if post.cover_image %}
                                     <img src="{{ post.cover_image }}" class="post-card-img" alt="{{ post.title }}">
                                 {% else %}
                                     <img src="{% static 'images/default-post.jpg' %}" class="post-card-img" alt="{{ post.title }}">
                                 {% endif %}
-                            </a>
-                            <!-- 标签覆盖在图片上（移动端） -->
-                            <div class="post-card-header d-md-none">
-                                {% if post.category %}
-                                    <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
-                                        {{ post.category.name }}
-                                    </a>
-                                {% endif %}
-                                {% if post.is_vip_only %}
-                                    <span class="vip-badge">VIP</span>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <!-- 内容区 -->
-                        <div class="post-card-body">
-                            <div class="post-card-main">
-                                <!-- 桌面端标签 -->
-                                <div class="post-card-header d-none d-md-block">
+                                <!-- 标签覆盖在图片上（移动端） -->
+                                <div class="post-card-header d-md-none">
                                     {% if post.category %}
-                                        <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
+                                        <span class="category-badge" onclick="event.stopPropagation(); window.location.href='{% url 'blog:category_posts' post.category.pk %}'">
                                             {{ post.category.name }}
-                                        </a>
+                                        </span>
                                     {% endif %}
                                     {% if post.is_vip_only %}
                                         <span class="vip-badge">VIP</span>
                                     {% endif %}
                                 </div>
-                                
-                                <h3>
-                                    <a href="{{ post.get_absolute_url }}" class="post-title">
-                                        {{ post.title }}
-                                    </a>
-                                </h3>
-                                
-                                <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
                             </div>
                             
-                            <!-- 底部统计数据 -->
-                            <div class="post-card-footer">
-                                <div class="post-stats">
-                                    <span class="post-stat">
-                                        <i class="far fa-eye"></i>
-                                        {{ post.views }}
-                                    </span>
-                                    <span class="post-stat">
-                                        <i class="far fa-heart"></i>
-                                        {{ post.likes }}
-                                    </span>
-                                    <span class="post-stat">
-                                        <i class="far fa-star"></i>
-                                        {{ post.favorites }}
-                                    </span>
-                                    <span class="post-stat">
-                                        <i class="far fa-comment"></i>
-                                        {{ post.comments.count }}
-                                    </span>
+                            <!-- 内容区 -->
+                            <div class="post-card-body">
+                                <div class="post-card-main">
+                                    <!-- 桌面端标签 -->
+                                    <div class="post-card-header d-none d-md-block">
+                                        {% if post.category %}
+                                            <span class="category-badge" onclick="event.stopPropagation(); window.location.href='{% url 'blog:category_posts' post.category.pk %}'">
+                                                {{ post.category.name }}
+                                            </span>
+                                        {% endif %}
+                                        {% if post.is_vip_only %}
+                                            <span class="vip-badge">VIP</span>
+                                        {% endif %}
+                                    </div>
+                                    
+                                    <h3 class="post-title">{{ post.title }}</h3>
+                                    
+                                    <p class="post-summary">{{ post.summary|truncatechars:120 }}</p>
+                                </div>
+                                
+                                <!-- 底部统计数据 -->
+                                <div class="post-card-footer">
+                                    <div class="post-stats">
+                                        <span class="post-stat">
+                                            <i class="far fa-eye"></i>
+                                            {{ post.views }}
+                                        </span>
+                                        <span class="post-stat">
+                                            <i class="far fa-heart"></i>
+                                            {{ post.likes }}
+                                        </span>
+                                        <span class="post-stat">
+                                            <i class="far fa-star"></i>
+                                            {{ post.favorites }}
+                                        </span>
+                                        <span class="post-stat">
+                                            <i class="far fa-comment"></i>
+                                            {{ post.comments.count }}
+                                        </span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </a>
                 </article>
                 {% empty %}
                 <div class="text-center py-5">

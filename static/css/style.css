@@ -330,6 +330,18 @@ body {
     border: 1px solid rgba(0, 0, 0, 0.06);
 }
 
+.post-card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+}
+
+.post-card-link:hover,
+.post-card-link:focus {
+    text-decoration: none;
+    color: inherit;
+}
+
 .post-card:hover {
     transform: translateY(-2px);
     box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
@@ -710,6 +722,9 @@ body {
     backdrop-filter: blur(4px);
     border: 1px solid rgba(255, 255, 255, 0.1);
     transition: all 0.2s ease;
+    cursor: pointer;
+    z-index: 20;
+    position: relative;
 }
 
 .category-badge:hover {
