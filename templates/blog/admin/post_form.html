@@ -10,141 +10,308 @@
 {% endblock %}
 
 {% block admin_content %}
-<div class="row post-edit-layout">
-    <div class="col-lg-8">
+<style>
+/* 专用于文章编辑页面的样式 */
+.article-edit-container {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 30px;
+    max-width: 100%;
+    margin: 0;
+}
+
+.main-content {
+    min-width: 0; /* 防止内容溢出 */
+}
+
+.sidebar {
+    min-width: 300px;
+    max-width: 400px;
+}
+
+@media (max-width: 1200px) {
+    .article-edit-container {
+        grid-template-columns: 1fr;
+        gap: 20px;
+    }
+    
+    .sidebar {
+        min-width: auto;
+        max-width: none;
+    }
+}
+
+.content-card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+    border: 1px solid #e5e7eb;
+    overflow: hidden;
+    margin-bottom: 20px;
+}
+
+.content-card-header {
+    padding: 20px 24px;
+    border-bottom: 1px solid #e5e7eb;
+    font-weight: 600;
+    font-size: 16px;
+    color: #1f2937;
+}
+
+.content-card-body {
+    padding: 24px;
+}
+
+.editor-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.info-header {
+    background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+    color: white;
+}
+
+.sidebar-header {
+    background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+    color: white;
+}
+
+.editor-toggle {
+    display: flex;
+    gap: 8px;
+}
+
+.editor-toggle .btn {
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    color: rgba(255, 255, 255, 0.9);
+    background: transparent;
+    font-size: 14px;
+}
+
+.editor-toggle .btn.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: white;
+}
+
+.form-section {
+    margin-bottom: 20px;
+}
+
+.form-section:last-child {
+    margin-bottom: 0;
+}
+
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    display: block;
+}
+
+.form-control {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 14px;
+    transition: border-color 0.2s;
+}
+
+.form-control:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    outline: none;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    background: #f9fafb;
+    border-top: 1px solid #e5e7eb;
+    margin-top: 20px;
+    border-radius: 0 0 12px 12px;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: transform 0.2s;
+}
+
+.btn-primary:hover {
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: #6b7280;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 8px;
+    font-weight: 600;
+    color: white;
+}
+
+.sidebar .content-card {
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+}
+
+.form-check {
+    margin-bottom: 12px;
+}
+
+.form-check-label {
+    font-weight: 500;
+    color: #374151;
+    margin-left: 8px;
+}
+
+/* CKEditor样式 */
+.ck.ck-editor {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+}
+
+.ck.ck-editor__editable {
+    min-height: 400px;
+}
+
+#markdown-preview {
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    background: #f8fafc;
+    padding: 16px;
+    margin-top: 12px;
+}
+</style>
+
+<div class="article-edit-container">
+    <!-- 主内容区域 -->
+    <div class="main-content">
+        {% if messages %}
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert" style="margin-bottom: 20px;">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+
         <!-- 基本信息卡片 -->
-        <div class="card shadow mb-4 basic-info-card">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold">文章基本信息</h6>
+        <div class="content-card">
+            <div class="content-card-header info-header">
+                文章基本信息
             </div>
-            <div class="card-body">
-                {% if messages %}
-                    {% for message in messages %}
-                        <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
-                            {{ message }}
-                            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                        </div>
-                    {% endfor %}
-                {% endif %}
-                
+            <div class="content-card-body">
                 <form method="post" enctype="multipart/form-data" id="postForm">
                     {% csrf_token %}
-                    <div class="mb-3">
-                        <label for="title" class="form-label">标题 *</label>
+                    
+                    <div class="form-section">
+                        <label for="title" class="form-label">文章标题 *</label>
                         <input type="text" class="form-control" id="title" name="title" 
-                               value="{% if post %}{{ post.title }}{% endif %}" required>
+                               value="{% if post %}{{ post.title }}{% endif %}" required 
+                               placeholder="请输入文章标题">
                     </div>
                     
-                    <div class="mb-3">
-                        <label for="summary" class="form-label">摘要</label>
-                        <textarea class="form-control" id="summary" name="summary" rows="3">{% if post %}{{ post.summary }}{% endif %}</textarea>
+                    <div class="form-section">
+                        <label for="summary" class="form-label">文章摘要</label>
+                        <textarea class="form-control" id="summary" name="summary" rows="3" 
+                                  placeholder="请输入文章摘要（可选）">{% if post %}{{ post.summary }}{% endif %}</textarea>
                     </div>
                     
-                    <div class="mb-3">
+                    <div class="form-section">
                         <label for="cover_image" class="form-label">封面图片</label>
                         <input type="file" class="form-control" id="cover_image" name="cover_image" accept="image/*">
                         {% if post.cover_image %}
-                            <div class="mt-2">
-                                <img src="{{ post.cover_image }}" alt="当前封面" style="max-width: 200px; height: auto;">
-                                <p class="small text-muted mt-1">当前封面图片</p>
+                            <div style="margin-top: 12px;">
+                                <img src="{{ post.cover_image }}" alt="当前封面" style="max-width: 200px; height: auto; border-radius: 8px;">
+                                <p style="font-size: 12px; color: #6b7280; margin-top: 4px;">当前封面图片</p>
                             </div>
                         {% endif %}
                     </div>
                 </form>
             </div>
         </div>
-        
+
         <!-- 内容编辑器卡片 -->
-        <div class="card shadow mb-4 editor-card">
-            <div class="card-header py-3">
-                <div class="d-flex justify-content-between align-items-center">
-                    <h6 class="m-0 font-weight-bold">文章内容</h6>
-                    <div class="btn-group btn-group-sm editor-mode-toggle" role="group">
-                        <input type="radio" class="btn-check" name="editor-mode" id="rich-editor" checked>
-                        <label class="btn btn-outline-primary" for="rich-editor">富文本编辑器</label>
-                        
-                        <input type="radio" class="btn-check" name="editor-mode" id="markdown-editor">
-                        <label class="btn btn-outline-primary" for="markdown-editor">Markdown编辑器</label>
+        <div class="content-card">
+            <div class="content-card-header editor-header">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <span>文章内容 *</span>
+                    <div class="editor-toggle">
+                        <button type="button" class="btn btn-sm active" id="rich-mode-btn" onclick="switchEditorMode('rich')">
+                            富文本编辑
+                        </button>
+                        <button type="button" class="btn btn-sm" id="markdown-mode-btn" onclick="switchEditorMode('markdown')">
+                            Markdown
+                        </button>
                     </div>
                 </div>
             </div>
-            <div class="card-body">
-                <!-- 编辑器容器 -->
+            <div class="content-card-body">
                 <div id="editor-container">
-                    <textarea class="form-control" id="content" name="content" rows="15" form="postForm" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                    <textarea class="form-control" id="content" name="content" rows="20" form="postForm" required 
+                              placeholder="开始编写你的文章内容...">{% if post %}{{ post.content }}{% endif %}</textarea>
                 </div>
                 
                 <!-- Markdown 预览区域 -->
-                <div id="markdown-preview" class="mt-3" style="display: none;">
-                    <div class="border p-3 bg-light">
-                        <h6>预览:</h6>
-                        <div id="preview-content"></div>
-                    </div>
+                <div id="markdown-preview" style="display: none;">
+                    <h6 style="margin-bottom: 12px; color: #374151;">预览:</h6>
+                    <div id="preview-content" style="line-height: 1.6;"></div>
                 </div>
             </div>
         </div>
-        
+
         <!-- 操作按钮 -->
         <div class="action-buttons">
-            <div class="d-flex gap-3">
-                <button type="submit" form="postForm" class="btn btn-primary btn-lg">
-                    <i class="fas fa-save me-2"></i>保存文章
-                </button>
-                <button type="button" class="btn btn-secondary btn-lg" onclick="history.back()">
-                    <i class="fas fa-times me-2"></i>取消
-                </button>
-            </div>
+            <button type="submit" form="postForm" class="btn btn-primary">
+                <i class="fas fa-save me-2"></i>保存文章
+            </button>
+            <button type="button" class="btn btn-secondary" onclick="history.back()">
+                <i class="fas fa-times me-2"></i>取消
+            </button>
         </div>
     </div>
-    
-    <div class="col-lg-4">
+
+    <!-- 右侧边栏 -->
+    <div class="sidebar">
         <!-- 发布选项 -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">发布选项</h6>
-            </div>
-            <div class="card-body">
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
-                               form="postForm" {% if not post or post.is_published %}checked{% endif %}>
-                        <label class="form-check-label" for="is_published">
-                            发布文章
-                        </label>
-                    </div>
+        <div class="content-card">
+            <div class="content-card-header sidebar-header">发布选项</div>
+            <div class="content-card-body">
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="is_published" name="is_published"
+                           form="postForm" {% if not post or post.is_published %}checked{% endif %}>
+                    <label class="form-check-label" for="is_published">发布文章</label>
                 </div>
                 
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
-                               form="postForm" {% if post.is_featured %}checked{% endif %}>
-                        <label class="form-check-label" for="is_featured">
-                            推荐文章
-                        </label>
-                    </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="is_featured" name="is_featured"
+                           form="postForm" {% if post.is_featured %}checked{% endif %}>
+                    <label class="form-check-label" for="is_featured">推荐文章</label>
                 </div>
                 
-                <div class="mb-3">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" id="is_vip_only" name="is_vip_only"
-                               form="postForm" {% if post.is_vip_only %}checked{% endif %}>
-                        <label class="form-check-label" for="is_vip_only">
-                            <i class="fas fa-crown text-warning me-1"></i>设为VIP文章
-                        </label>
-                        <div class="form-text">
-                            <small class="text-muted">仅VIP用户可以阅读此文章</small>
-                        </div>
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="is_vip_only" name="is_vip_only"
+                           form="postForm" {% if post.is_vip_only %}checked{% endif %}>
+                    <label class="form-check-label" for="is_vip_only">
+                        <i class="fas fa-crown text-warning me-1"></i>设为VIP文章
+                    </label>
+                    <div style="font-size: 12px; color: #6b7280; margin-top: 4px;">
+                        仅VIP用户可以阅读此文章
                     </div>
                 </div>
             </div>
         </div>
         
-        <!-- 分类 -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">分类</h6>
-            </div>
-            <div class="card-body">
+        <!-- 分类选择 -->
+        <div class="content-card">
+            <div class="content-card-header sidebar-header">文章分类</div>
+            <div class="content-card-body">
                 <select class="form-control" name="category" form="postForm">
                     <option value="">请选择分类</option>
                     {% for category in categories %}
@@ -157,16 +324,14 @@
             </div>
         </div>
         
-        <!-- 标签 -->
-        <div class="card shadow mb-4">
-            <div class="card-header py-3">
-                <h6 class="m-0 font-weight-bold text-primary">标签</h6>
-            </div>
-            <div class="card-body">
+        <!-- 标签选择 -->
+        <div class="content-card">
+            <div class="content-card-header sidebar-header">文章标签</div>
+            <div class="content-card-body">
                 {% for tag in tags %}
                     <div class="form-check">
-                        <input class="form-check-input" type="checkbox" name="tags" value="{{ tag.id }}"
-                               id="tag_{{ tag.id }}" form="postForm"
+                        <input class="form-check-input" type="checkbox" id="tag_{{ tag.id }}" 
+                               name="tags" value="{{ tag.id }}" form="postForm"
                                {% if post and tag in post.tags.all %}checked{% endif %}>
                         <label class="form-check-label" for="tag_{{ tag.id }}">
                             {{ tag.name }}
@@ -184,129 +349,45 @@
 <script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
 
 <script>
-let currentEditorMode = 'rich'; // 'rich' or 'markdown'
+let currentEditorMode = 'rich';
 let ckEditorInstance = null;
 
-// 初始化CKEditor富文本编辑器
+// 初始化CKEditor
 function initCKEditor() {
     if (ckEditorInstance) {
-        return; // 已经初始化
+        return;
     }
     
     ClassicEditor
         .create(document.querySelector('#content'), {
             toolbar: {
                 items: [
-                    'heading',
-                    '|',
-                    'bold',
-                    'italic',
-                    'underline',
-                    'strikethrough',
-                    'link',
-                    'bulletedList',
-                    'numberedList',
-                    '|',
-                    'outdent',
-                    'indent',
-                    '|',
-                    'imageUpload',
-                    'blockQuote',
-                    'insertTable',
-                    'mediaEmbed',
-                    '|',
-                    'undo',
-                    'redo',
-                    'alignment',
-                    'fontColor',
-                    'fontBackgroundColor',
-                    'fontSize',
-                    'fontFamily',
-                    '|',
-                    'code',
-                    'codeBlock',
-                    'sourceEditing'
+                    'heading', '|',
+                    'bold', 'italic', 'underline', 'strikethrough', '|',
+                    'link', 'bulletedList', 'numberedList', '|',
+                    'outdent', 'indent', '|',
+                    'imageUpload', 'blockQuote', 'insertTable', '|',
+                    'undo', 'redo', '|',
+                    'alignment', 'fontColor', 'fontBackgroundColor', '|',
+                    'code', 'codeBlock', 'sourceEditing'
                 ]
             },
             language: 'zh-cn',
-            image: {
-                toolbar: [
-                    'imageTextAlternative',
-                    'imageStyle:inline',
-                    'imageStyle:block',
-                    'imageStyle:side'
-                ]
-            },
-            table: {
-                contentToolbar: [
-                    'tableColumn',
-                    'tableRow',
-                    'mergeTableCells',
-                    'tableCellProperties',
-                    'tableProperties'
-                ]
-            },
             heading: {
                 options: [
                     { model: 'paragraph', title: '段落', class: 'ck-heading_paragraph' },
                     { model: 'heading1', view: 'h1', title: '标题 1', class: 'ck-heading_heading1' },
                     { model: 'heading2', view: 'h2', title: '标题 2', class: 'ck-heading_heading2' },
-                    { model: 'heading3', view: 'h3', title: '标题 3', class: 'ck-heading_heading3' },
-                    { model: 'heading4', view: 'h4', title: '标题 4', class: 'ck-heading_heading4' },
-                    { model: 'heading5', view: 'h5', title: '标题 5', class: 'ck-heading_heading5' },
-                    { model: 'heading6', view: 'h6', title: '标题 6', class: 'ck-heading_heading6' }
+                    { model: 'heading3', view: 'h3', title: '标题 3', class: 'ck-heading_heading3' }
                 ]
-            },
-            fontSize: {
-                options: [
-                    9,
-                    11,
-                    13,
-                    'default',
-                    17,
-                    19,
-                    21
-                ]
-            },
-            fontFamily: {
-                options: [
-                    'default',
-                    'Arial, Helvetica, sans-serif',
-                    'Courier New, Courier, monospace',
-                    'Georgia, serif',
-                    'Lucida Sans Unicode, Lucida Grande, sans-serif',
-                    'Tahoma, Geneva, sans-serif',
-                    'Times New Roman, Times, serif',
-                    'Trebuchet MS, Helvetica, sans-serif',
-                    'Verdana, Geneva, sans-serif',
-                    'Microsoft YaHei, 微软雅黑, sans-serif',
-                    'SimSun, 宋体, serif',
-                    'SimHei, 黑体, sans-serif'
-                ]
-            },
-            alignment: {
-                options: ['left', 'center', 'right', 'justify']
-            },
-            // 禁用图片上传功能
-            simpleUpload: {
-                uploadUrl: '#',
-                withCredentials: false,
-                headers: {
-                    'X-CSRF-TOKEN': 'CSRF-Token'
-                }
             }
         })
         .then(editor => {
-            console.log('CKEditor编辑器初始化完成');
             ckEditorInstance = editor;
-            
-            // 添加标记类
-            document.getElementById('editor-container').classList.add('ck-editor-active');
-            
             // 设置编辑器高度
             const editable = editor.ui.getEditableElement();
             if (editable) {
-                editable.style.height = '500px';
+                editable.style.minHeight = '400px';
             }
         })
         .catch(error => {
@@ -314,19 +395,15 @@ function initCKEditor() {
         });
 }
 
-// 销毁CKEditor编辑器
+// 销毁CKEditor
 function destroyCKEditor() {
     if (ckEditorInstance) {
         ckEditorInstance.destroy()
             .then(() => {
-                console.log('CKEditor编辑器已销毁');
                 ckEditorInstance = null;
-                
-                // 移除标记类
-                document.getElementById('editor-container').classList.remove('ck-editor-active');
             })
             .catch(error => {
-                console.error('销毁CKEditor编辑器失败:', error);
+                console.error('销毁CKEditor失败:', error);
             });
     }
 }
@@ -335,102 +412,24 @@ function destroyCKEditor() {
 function initMarkdownEditor() {
     const textarea = document.getElementById('content');
     const previewDiv = document.getElementById('markdown-preview');
-    const previewContent = document.getElementById('preview-content');
     
-    // 显示预览区域
     previewDiv.style.display = 'block';
+    textarea.style.fontFamily = '"Courier New", monospace';
+    textarea.style.fontSize = '14px';
     
-    // 添加Markdown工具栏
-    if (!document.getElementById('markdown-toolbar')) {
-        const toolbar = document.createElement('div');
-        toolbar.id = 'markdown-toolbar';
-        toolbar.className = 'btn-toolbar mb-2';
-        toolbar.innerHTML = `
-            <div class="btn-group btn-group-sm me-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('**', '**', '粗体文本')" title="粗体">
-                    <i class="fas fa-bold"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('*', '*', '斜体文本')" title="斜体">
-                    <i class="fas fa-italic"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('~~', '~~', '删除线文本')" title="删除线">
-                    <i class="fas fa-strikethrough"></i>
-                </button>
-            </div>
-            <div class="btn-group btn-group-sm me-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('# ', '', '标题')" title="标题1">H1</button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('## ', '', '标题')" title="标题2">H2</button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('### ', '', '标题')" title="标题3">H3</button>
-            </div>
-            <div class="btn-group btn-group-sm me-2">
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('[', '](链接地址)', '链接文本')" title="链接">
-                    <i class="fas fa-link"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('![](', ')', '图片描述')" title="图片">
-                    <i class="fas fa-image"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('\`\`\`\\n', '\\n\`\`\`', '代码内容')" title="代码块">
-                    <i class="fas fa-code"></i>
-                </button>
-            </div>
-            <div class="btn-group btn-group-sm">
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('- ', '', '列表项')" title="无序列表">
-                    <i class="fas fa-list-ul"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('1. ', '', '列表项')" title="有序列表">
-                    <i class="fas fa-list-ol"></i>
-                </button>
-                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('> ', '', '引用内容')" title="引用">
-                    <i class="fas fa-quote-right"></i>
-                </button>
-            </div>
-        `;
-        textarea.parentNode.insertBefore(toolbar, textarea);
-    }
-    
-    // 监听输入变化，实时更新预览
-    textarea.addEventListener('input', function() {
-        updateMarkdownPreview();
-    });
-    
-    // 初始预览
+    // 监听输入变化
+    textarea.addEventListener('input', updateMarkdownPreview);
     updateMarkdownPreview();
 }
 
 // 清理Markdown编辑器
 function cleanupMarkdownEditor() {
     const previewDiv = document.getElementById('markdown-preview');
-    const toolbar = document.getElementById('markdown-toolbar');
-    
-    if (previewDiv) {
-        previewDiv.style.display = 'none';
-    }
-    
-    if (toolbar) {
-        toolbar.remove();
-    }
-}
-
-// 插入Markdown语法
-function insertMarkdown(prefix, suffix, placeholder) {
     const textarea = document.getElementById('content');
-    const start = textarea.selectionStart;
-    const end = textarea.selectionEnd;
-    const selectedText = textarea.value.substring(start, end);
-    const insertText = selectedText || placeholder;
     
-    const newText = prefix + insertText + suffix;
-    textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
-    
-    // 设置光标位置
-    if (selectedText) {
-        textarea.setSelectionRange(start, start + newText.length);
-    } else {
-        textarea.setSelectionRange(start + prefix.length, start + prefix.length + placeholder.length);
-    }
-    
-    textarea.focus();
-    updateMarkdownPreview();
+    previewDiv.style.display = 'none';
+    textarea.style.fontFamily = '';
+    textarea.style.fontSize = '';
 }
 
 // 更新Markdown预览
@@ -445,48 +444,41 @@ function updateMarkdownPreview() {
     }
 }
 
-// 编辑器模式切换
-document.addEventListener('DOMContentLoaded', function() {
-    const richEditorRadio = document.getElementById('rich-editor');
-    const markdownEditorRadio = document.getElementById('markdown-editor');
+// 切换编辑器模式
+function switchEditorMode(mode) {
+    const richBtn = document.getElementById('rich-mode-btn');
+    const markdownBtn = document.getElementById('markdown-mode-btn');
     
-    // 默认初始化富文本编辑器
-    initCKEditor();
-    
-    richEditorRadio.addEventListener('change', function() {
-        if (this.checked) {
-            currentEditorMode = 'rich';
-            cleanupMarkdownEditor();
-            setTimeout(() => {
-                initCKEditor();
-            }, 100);
-        }
-    });
-    
-    markdownEditorRadio.addEventListener('change', function() {
-        if (this.checked) {
-            currentEditorMode = 'markdown';
-            destroyCKEditor();
-            setTimeout(() => {
-                initMarkdownEditor();
-            }, 100);
-        }
-    });
-});
+    if (mode === 'rich') {
+        currentEditorMode = 'rich';
+        richBtn.classList.add('active');
+        markdownBtn.classList.remove('active');
+        
+        cleanupMarkdownEditor();
+        setTimeout(() => {
+            initCKEditor();
+        }, 100);
+    } else {
+        currentEditorMode = 'markdown';
+        markdownBtn.classList.add('active');
+        richBtn.classList.remove('active');
+        
+        destroyCKEditor();
+        setTimeout(() => {
+            initMarkdownEditor();
+        }, 100);
+    }
+}
 
-// 表单提交前验证
-document.querySelector('form').addEventListener('submit', function(e) {
+// 表单提交验证
+document.getElementById('postForm').addEventListener('submit', function(e) {
     const title = document.getElementById('title').value.trim();
     let content = '';
     
     if (currentEditorMode === 'rich' && ckEditorInstance) {
-        // 获取CKEditor编辑器内容
         content = ckEditorInstance.getData().trim();
-        
-        // 将CKEditor内容同步到textarea
         document.getElementById('content').value = ckEditorInstance.getData();
     } else {
-        // 获取普通textarea内容
         content = document.getElementById('content').value.trim();
     }
     
@@ -495,6 +487,11 @@ document.querySelector('form').addEventListener('submit', function(e) {
         alert('标题和内容不能为空');
         return false;
     }
+});
+
+// 页面加载完成后初始化
+document.addEventListener('DOMContentLoaded', function() {
+    initCKEditor();
 });
 </script>
 {% endblock %}
