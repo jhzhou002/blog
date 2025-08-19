@@ -4,229 +4,266 @@
 {% block page_title %}{{ title }}{% endblock %}
 
 {% block extra_head %}
+<link rel="stylesheet" href="{% static 'css/admin-common.css' %}">
 <link rel="stylesheet" href="{% static 'css/admin-posts-list.css' %}">
 {% endblock %}
 
 {% block page_actions %}
-<a href="{% url 'blog:admin_post_add' %}" class="btn btn-primary">
-    <i class="fas fa-plus me-2"></i>新建文章
-</a>
+<div class="page-actions-admin">
+    <a href="{% url 'blog:admin_post_add' %}" class="btn-admin primary">
+        <i class="fas fa-plus"></i>新建文章
+    </a>
+</div>
 {% endblock %}
 
 {% block admin_content %}
 <!-- 页面头部 -->
-<div class="posts-header">
-    <div class="d-flex justify-content-between align-items-center">
+<div class="page-header-admin">
+    <div class="header-content">
         <div>
-            <h1><i class="fas fa-newspaper me-2"></i>文章管理</h1>
-            <p class="subtitle">管理和编辑你的博客文章</p>
+            <h1 class="page-title-admin">
+                <i class="fas fa-newspaper"></i>文章管理
+            </h1>
+            <p class="page-subtitle-admin">管理和编辑你的博客文章</p>
         </div>
-        <div class="text-end">
-            <div style="font-size: 2rem; opacity: 0.9;">{{ posts.paginator.count }}</div>
-            <div style="font-size: 0.9rem; opacity: 0.8;">篇文章</div>
+        <div class="text-center">
+            <div class="stat-number text-white">{{ posts.paginator.count }}</div>
+            <div class="stat-label text-white">篇文章</div>
         </div>
     </div>
 </div>
 
 <!-- 筛选器 -->
-<div class="posts-filters">
-    <form method="get" id="filterForm">
-        <div class="filter-row">
-            <div class="filter-group">
-                <label class="filter-label">
-                    <i class="fas fa-search me-1"></i>搜索文章
-                </label>
-                <input type="text" name="search" class="filter-input" 
-                       placeholder="输入标题或内容关键词..." 
-                       value="{{ request.GET.search }}">
+<div class="admin-card mb-4">
+    <div class="admin-card-header">
+        <span><i class="fas fa-filter"></i>筛选和搜索</span>
+    </div>
+    <div class="admin-card-body">
+        <form method="get" id="filterForm">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="form-group-admin">
+                        <label class="form-label-admin">
+                            <i class="fas fa-search"></i>搜索文章
+                        </label>
+                        <input type="text" name="search" class="form-input-admin" 
+                               placeholder="输入标题或内容关键词..." 
+                               value="{{ request.GET.search }}">
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="form-group-admin">
+                        <label class="form-label-admin">
+                            <i class="fas fa-folder"></i>分类
+                        </label>
+                        <select name="category" class="form-input-admin form-select-admin">
+                            <option value="">所有分类</option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" 
+                                        {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-3">
+                    <div class="form-group-admin">
+                        <label class="form-label-admin">
+                            <i class="fas fa-eye"></i>状态
+                        </label>
+                        <select name="status" class="form-input-admin form-select-admin">
+                            <option value="">所有状态</option>
+                            <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>已发布</option>
+                            <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>草稿</option>
+                            <option value="featured" {% if request.GET.status == 'featured' %}selected{% endif %}>推荐</option>
+                            <option value="vip" {% if request.GET.status == 'vip' %}selected{% endif %}>VIP</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="col-md-2">
+                    <div class="form-group-admin">
+                        <label class="form-label-admin">&nbsp;</label>
+                        <button type="submit" class="btn-admin primary block">
+                            <i class="fas fa-search"></i>筛选
+                        </button>
+                    </div>
+                </div>
             </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">
-                    <i class="fas fa-folder me-1"></i>分类
-                </label>
-                <select name="category" class="filter-input">
-                    <option value="">所有分类</option>
-                    {% for category in categories %}
-                        <option value="{{ category.id }}" 
-                                {% if request.GET.category == category.id|stringformat:"s" %}selected{% endif %}>
-                            {{ category.name }}
-                        </option>
-                    {% endfor %}
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <label class="filter-label">
-                    <i class="fas fa-eye me-1"></i>状态
-                </label>
-                <select name="status" class="filter-input">
-                    <option value="">所有状态</option>
-                    <option value="published" {% if request.GET.status == 'published' %}selected{% endif %}>已发布</option>
-                    <option value="draft" {% if request.GET.status == 'draft' %}selected{% endif %}>草稿</option>
-                    <option value="featured" {% if request.GET.status == 'featured' %}selected{% endif %}>推荐</option>
-                    <option value="vip" {% if request.GET.status == 'vip' %}selected{% endif %}>VIP</option>
-                </select>
-            </div>
-            
-            <div class="filter-group">
-                <button type="submit" class="btn btn-primary" style="padding: 10px 20px; border-radius: 8px;">
-                    <i class="fas fa-filter me-1"></i>筛选
-                </button>
-            </div>
-        </div>
-    </form>
+        </form>
+    </div>
 </div>
 
 <!-- 批量操作 -->
-<div class="bulk-actions" id="bulkActions">
-    <div class="bulk-actions-content">
-        <span class="selected-count">
+<div class="admin-card mb-4" id="bulkActions" style="display: none;">
+    <div class="admin-card-header warning">
+        <span>
+            <i class="fas fa-tasks"></i>
             已选择 <span id="selectedCount">0</span> 篇文章
         </span>
-        <button type="button" class="bulk-btn" onclick="bulkPublish()">
-            <i class="fas fa-globe me-1"></i>批量发布
-        </button>
-        <button type="button" class="bulk-btn" onclick="bulkUnpublish()">
-            <i class="fas fa-eye-slash me-1"></i>取消发布
-        </button>
-        <button type="button" class="bulk-btn danger" onclick="bulkDelete()">
-            <i class="fas fa-trash me-1"></i>批量删除
-        </button>
-        <button type="button" class="bulk-btn" onclick="clearSelection()">
-            <i class="fas fa-times me-1"></i>取消选择
-        </button>
+    </div>
+    <div class="admin-card-body">
+        <div class="d-flex gap-md flex-wrap">
+            <button type="button" class="btn-admin success" onclick="bulkPublish()">
+                <i class="fas fa-globe"></i>批量发布
+            </button>
+            <button type="button" class="btn-admin secondary" onclick="bulkUnpublish()">
+                <i class="fas fa-eye-slash"></i>取消发布
+            </button>
+            <button type="button" class="btn-admin danger" onclick="bulkDelete()">
+                <i class="fas fa-trash"></i>批量删除
+            </button>
+            <button type="button" class="btn-admin outline" onclick="clearSelection()">
+                <i class="fas fa-times"></i>取消选择
+            </button>
+        </div>
     </div>
 </div>
 
 <!-- 文章卡片网格 -->
 {% if posts %}
-<div class="posts-grid">
+<div class="row">
     {% for post in posts %}
-    <div class="post-card">
-        <div class="post-card-header">
-            <div style="display: flex; align-items: flex-start; gap: 12px;">
-                <input type="checkbox" class="post-checkbox" value="{{ post.id }}" 
-                       style="margin-top: 4px;" onchange="updateBulkActions()">
-                <div style="flex: 1;">
-                    <h3 class="post-title">
-                        <a href="{{ post.get_absolute_url }}" target="_blank">
-                            {{ post.title|truncatechars:60 }}
-                        </a>
-                    </h3>
-                    <div class="post-meta">
-                        <span><i class="fas fa-user me-1"></i>{{ post.author.username }}</span>
-                        <span><i class="fas fa-calendar me-1"></i>{{ post.created_at|date:"m-d" }}</span>
-                        {% if post.category %}
-                            <span class="post-badge badge-category">
-                                <i class="fas fa-folder me-1"></i>{{ post.category.name }}
+    <div class="col-xl-4 col-lg-6 col-md-6 mb-4">
+        <div class="admin-card animate-fade-in">
+            <div class="admin-card-header">
+                <div class="d-flex align-items-center gap-md">
+                    <input type="checkbox" class="form-check-input-admin post-checkbox" value="{{ post.id }}" 
+                           onchange="updateBulkActions()">
+                    <div class="flex-fill">
+                        <h6 class="mb-2 text-truncate">
+                            <a href="{{ post.get_absolute_url }}" target="_blank" class="text-decoration-none">
+                                {{ post.title|truncatechars:50 }}
+                            </a>
+                        </h6>
+                        <div class="d-flex gap-sm flex-wrap">
+                            <span class="badge-admin gray">
+                                <i class="fas fa-user"></i>{{ post.author.username }}
                             </span>
-                        {% endif %}
-                        {% if post.is_published %}
-                            <span class="post-badge badge-published">
-                                <i class="fas fa-check me-1"></i>已发布
+                            <span class="badge-admin gray">
+                                <i class="fas fa-calendar"></i>{{ post.created_at|date:"m-d" }}
                             </span>
-                        {% else %}
-                            <span class="post-badge badge-draft">
-                                <i class="fas fa-edit me-1"></i>草稿
-                            </span>
-                        {% endif %}
-                        {% if post.is_featured %}
-                            <span class="post-badge badge-featured">
-                                <i class="fas fa-star me-1"></i>推荐
-                            </span>
-                        {% endif %}
-                        {% if post.is_vip_only %}
-                            <span class="post-badge badge-vip">
-                                <i class="fas fa-crown me-1"></i>VIP
-                            </span>
-                        {% endif %}
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-        
-        <div class="post-card-body">
-            <div class="post-stats">
-                <div class="stat-item">
-                    <span class="stat-number">{{ post.views }}</span>
-                    <span class="stat-label">浏览</span>
+            
+            <div class="admin-card-body">
+                <!-- 状态徽章 -->
+                <div class="d-flex gap-sm flex-wrap mb-3">
+                    {% if post.category %}
+                        <span class="badge-admin info">
+                            <i class="fas fa-folder"></i>{{ post.category.name }}
+                        </span>
+                    {% endif %}
+                    {% if post.is_published %}
+                        <span class="badge-admin success">
+                            <i class="fas fa-check"></i>已发布
+                        </span>
+                    {% else %}
+                        <span class="badge-admin gray">
+                            <i class="fas fa-edit"></i>草稿
+                        </span>
+                    {% endif %}
+                    {% if post.is_featured %}
+                        <span class="badge-admin warning">
+                            <i class="fas fa-star"></i>推荐
+                        </span>
+                    {% endif %}
+                    {% if post.is_vip_only %}
+                        <span class="badge-admin warning">
+                            <i class="fas fa-crown"></i>VIP
+                        </span>
+                    {% endif %}
                 </div>
-                <div class="stat-item">
-                    <span class="stat-number">{{ post.likes }}</span>
-                    <span class="stat-label">点赞</span>
-                </div>
-                <div class="stat-item">
-                    <span class="stat-number">{{ post.comment_count }}</span>
-                    <span class="stat-label">评论</span>
+                
+                <!-- 统计数据 -->
+                <div class="row text-center mb-3">
+                    <div class="col-4">
+                        <div class="stat-number">{{ post.views }}</div>
+                        <div class="stat-label">浏览</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number">{{ post.likes }}</div>
+                        <div class="stat-label">点赞</div>
+                    </div>
+                    <div class="col-4">
+                        <div class="stat-number">{{ post.comment_count }}</div>
+                        <div class="stat-label">评论</div>
+                    </div>
                 </div>
             </div>
             
-            <div class="post-actions">
-                <a href="{{ post.get_absolute_url }}" target="_blank" class="action-btn btn-view">
-                    <i class="fas fa-eye"></i>查看
-                </a>
-                <a href="{% url 'blog:admin_post_edit' post.pk %}" class="action-btn btn-edit">
-                    <i class="fas fa-edit"></i>编辑
-                </a>
-                <a href="{% url 'blog:admin_post_delete' post.pk %}" 
-                   class="action-btn btn-delete" 
-                   onclick="return confirm('确定要删除这篇文章吗？')">
-                    <i class="fas fa-trash"></i>删除
-                </a>
+            <div class="admin-card-footer">
+                <div class="d-flex gap-sm justify-content-center w-100">
+                    <a href="{{ post.get_absolute_url }}" target="_blank" class="btn-admin info small">
+                        <i class="fas fa-eye"></i>查看
+                    </a>
+                    <a href="{% url 'blog:admin_post_edit' post.pk %}" class="btn-admin success small">
+                        <i class="fas fa-edit"></i>编辑
+                    </a>
+                    <a href="{% url 'blog:admin_post_delete' post.pk %}" 
+                       class="btn-admin danger small" 
+                       onclick="return confirm('确定要删除这篇文章吗？')">
+                        <i class="fas fa-trash"></i>删除
+                    </a>
+                </div>
             </div>
         </div>
     </div>
     {% endfor %}
 </div>
 {% else %}
-<div class="empty-state">
-    <div class="empty-icon">
-        <i class="fas fa-newspaper"></i>
+<div class="admin-card text-center">
+    <div class="admin-card-body" style="padding: 4rem 2rem;">
+        <div style="font-size: 4rem; color: var(--gray-300); margin-bottom: 2rem;">
+            <i class="fas fa-newspaper"></i>
+        </div>
+        <h3 style="color: var(--gray-700); margin-bottom: 1rem;">还没有文章</h3>
+        <p style="color: var(--gray-500); margin-bottom: 2rem;">开始创建你的第一篇博客文章吧！</p>
+        <a href="{% url 'blog:admin_post_add' %}" class="btn-admin primary large">
+            <i class="fas fa-plus"></i>创建文章
+        </a>
     </div>
-    <h3 class="empty-title">还没有文章</h3>
-    <p class="empty-text">开始创建你的第一篇博客文章吧！</p>
-    <a href="{% url 'blog:admin_post_add' %}" class="btn btn-primary">
-        <i class="fas fa-plus me-2"></i>创建文章
-    </a>
 </div>
 {% endif %}
 
 <!-- 分页 -->
 {% if posts.has_other_pages %}
-<div class="pagination-container">
-    <div class="pagination">
-        {% if posts.has_previous %}
-            <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
-               class="page-btn">
-                <i class="fas fa-angle-double-left"></i>
-            </a>
-            <a href="?page={{ posts.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
-               class="page-btn">
-                <i class="fas fa-angle-left"></i>
-            </a>
+<div class="pagination-admin">
+    {% if posts.has_previous %}
+        <a href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+           class="page-link">
+            <i class="fas fa-angle-double-left"></i>
+        </a>
+        <a href="?page={{ posts.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+           class="page-link">
+            <i class="fas fa-angle-left"></i>
+        </a>
+    {% endif %}
+    
+    {% for num in posts.paginator.page_range %}
+        {% if posts.number == num %}
+            <span class="page-link active">{{ num }}</span>
+        {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
+            <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+               class="page-link">{{ num }}</a>
         {% endif %}
-        
-        {% for num in posts.paginator.page_range %}
-            {% if posts.number == num %}
-                <span class="page-btn active">{{ num }}</span>
-            {% elif num > posts.number|add:'-3' and num < posts.number|add:'3' %}
-                <a href="?page={{ num }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
-                   class="page-btn">{{ num }}</a>
-            {% endif %}
-        {% endfor %}
-        
-        {% if posts.has_next %}
-            <a href="?page={{ posts.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
-               class="page-btn">
-                <i class="fas fa-angle-right"></i>
-            </a>
-            <a href="?page={{ posts.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
-               class="page-btn">
-                <i class="fas fa-angle-double-right"></i>
-            </a>
-        {% endif %}
-    </div>
+    {% endfor %}
+    
+    {% if posts.has_next %}
+        <a href="?page={{ posts.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+           class="page-link">
+            <i class="fas fa-angle-right"></i>
+        </a>
+        <a href="?page={{ posts.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category }}{% endif %}{% if request.GET.status %}&status={{ request.GET.status }}{% endif %}" 
+           class="page-link">
+            <i class="fas fa-angle-double-right"></i>
+        </a>
+    {% endif %}
 </div>
 {% endif %}
 {% endblock %}
@@ -250,10 +287,12 @@ function updateBulkActions() {
     const selectedCount = document.getElementById('selectedCount');
     
     if (selectedPosts.size > 0) {
-        bulkActions.classList.add('show');
+        bulkActions.style.display = 'block';
+        bulkActions.classList.add('animate-fade-in');
         selectedCount.textContent = selectedPosts.size;
     } else {
-        bulkActions.classList.remove('show');
+        bulkActions.style.display = 'none';
+        bulkActions.classList.remove('animate-fade-in');
     }
 }
 
