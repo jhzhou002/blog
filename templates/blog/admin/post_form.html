@@ -69,7 +69,10 @@
                 </div>
             </div>
             <div class="card-body">
-                <textarea class="form-control" id="content" name="content" rows="15" form="postForm" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                <!-- 编辑器容器 -->
+                <div id="editor-container">
+                    <textarea class="form-control" id="content" name="content" rows="15" form="postForm" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                </div>
                 
                 <!-- Markdown 预览区域 -->
                 <div id="markdown-preview" class="mt-3" style="display: none;">
@@ -297,10 +300,14 @@ function initCKEditor() {
             console.log('CKEditor编辑器初始化完成');
             ckEditorInstance = editor;
             
+            // 添加标记类
+            document.getElementById('editor-container').classList.add('ck-editor-active');
+            
             // 设置编辑器高度
-            editor.editing.view.change(writer => {
-                writer.setStyle('height', '500px', editor.editing.view.document.getRoot());
-            });
+            const editable = editor.ui.getEditableElement();
+            if (editable) {
+                editable.style.height = '500px';
+            }
         })
         .catch(error => {
             console.error('CKEditor初始化失败:', error);
@@ -314,6 +321,9 @@ function destroyCKEditor() {
             .then(() => {
                 console.log('CKEditor编辑器已销毁');
                 ckEditorInstance = null;
+                
+                // 移除标记类
+                document.getElementById('editor-container').classList.remove('ck-editor-active');
             })
             .catch(error => {
                 console.error('销毁CKEditor编辑器失败:', error);
