@@ -776,6 +776,14 @@ body {
     cursor: pointer;
 }
 
+.mobile-logo-link {
+    text-decoration: none;
+}
+
+.mobile-logo-link:hover .mobile-logo {
+    color: var(--primary-color);
+}
+
 .mobile-logo {
     font-size: 1.25rem;
     font-weight: 600;

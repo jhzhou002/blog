@@ -7,18 +7,10 @@
 <div class="container">
     <div class="row">
         <!-- Main Content -->
-        <div class="col-lg-8">
+        <div class="col-lg-8 col-md-12">
             <article class="post-detail">
                 <!-- Post Header -->
                 <header class="post-header">
-                    {% if post.is_vip_only %}
-                        <div class="vip-post-header">
-                            <i class="fas fa-crown"></i>
-                            <strong>VIP专属文章</strong>
-                            <div><small>感谢您的VIP支持</small></div>
-                        </div>
-                    {% endif %}
-                    
                     <div class="post-header-info">
                         {% if post.category %}
                             <a href="{% url 'blog:category_posts' post.category.pk %}" class="category-badge">
@@ -229,8 +221,8 @@
             </section>
         </div>
 
-        <!-- Sidebar -->
-        <div class="col-lg-4">
+        <!-- Sidebar (hidden on mobile) -->
+        <div class="col-lg-4 d-none d-lg-block">
             <!-- Author Info -->
             <div class="sidebar-card">
                 <h5>作者信息</h5>
