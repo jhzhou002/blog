@@ -40,8 +40,25 @@
                     </div>
                     
                     <div class="mb-3">
-                        <label for="content" class="form-label">内容 *</label>
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <label for="content" class="form-label mb-0">内容 *</label>
+                            <div class="btn-group btn-group-sm" role="group">
+                                <input type="radio" class="btn-check" name="editor-mode" id="rich-editor" checked>
+                                <label class="btn btn-outline-primary" for="rich-editor">富文本编辑器</label>
+                                
+                                <input type="radio" class="btn-check" name="editor-mode" id="markdown-editor">
+                                <label class="btn btn-outline-primary" for="markdown-editor">Markdown编辑器</label>
+                            </div>
+                        </div>
                         <textarea class="form-control" id="content" name="content" rows="15" required>{% if post %}{{ post.content }}{% endif %}</textarea>
+                        
+                        <!-- Markdown 预览区域 -->
+                        <div id="markdown-preview" class="mt-3" style="display: none;">
+                            <div class="border p-3 bg-light">
+                                <h6>预览:</h6>
+                                <div id="preview-content"></div>
+                            </div>
+                        </div>
                     </div>
                     
                     <div class="mb-3">
@@ -149,15 +166,247 @@
     </div>
 </div>
 
+<!-- TinyMCE CDN -->
+<script src="https://cdn.tiny.cloud/1/no-api-key/tinymce/6/tinymce.min.js" referrerpolicy="origin"></script>
+<!-- Marked.js for Markdown parsing -->
+<script src="https://cdn.jsdelivr.net/npm/marked@11.1.1/marked.min.js"></script>
+
 <script>
-// 简单的表单验证
+let currentEditorMode = 'rich'; // 'rich' or 'markdown'
+let tinyMCEInstance = null;
+
+// 初始化TinyMCE富文本编辑器
+function initTinyMCE() {
+    if (tinyMCEInstance) {
+        return; // 已经初始化
+    }
+    
+    tinymce.init({
+        selector: '#content',
+        height: 500,
+        menubar: 'file edit view insert format tools table help',
+        plugins: [
+            'advlist', 'autolink', 'lists', 'link', 'image', 'charmap', 'preview',
+            'anchor', 'searchreplace', 'visualblocks', 'code', 'fullscreen',
+            'insertdatetime', 'media', 'table', 'help', 'wordcount'
+        ],
+        toolbar: 'undo redo | blocks | ' +
+            'bold italic forecolor | alignleft aligncenter ' +
+            'alignright alignjustify | bullist numlist outdent indent | ' +
+            'removeformat | help | fullscreen | code',
+        content_style: 'body { font-family:Arial,sans-serif; font-size:14px }',
+        language: 'zh_CN',
+        branding: false,
+        resize: true,
+        // 添加图片上传功能配置
+        images_upload_url: false, // 禁用默认图片上传
+        // 自定义图片上传处理
+        images_upload_handler: function (blobInfo, success, failure) {
+            console.log('图片上传暂未配置');
+            failure('图片上传功能暂未配置');
+        },
+        // 自定义样式
+        content_css: [
+            '{% static "css/style.css" %}'
+        ],
+        // 支持HTML5
+        extended_valid_elements: 'script[src|async|defer|type|charset]',
+        // 代码高亮相关
+        codesample_languages: [
+            {text: 'HTML/XML', value: 'markup'},
+            {text: 'JavaScript', value: 'javascript'},
+            {text: 'CSS', value: 'css'},
+            {text: 'Python', value: 'python'},
+            {text: 'Java', value: 'java'},
+            {text: 'C++', value: 'cpp'},
+            {text: 'C#', value: 'csharp'},
+            {text: 'SQL', value: 'sql'},
+            {text: 'JSON', value: 'json'}
+        ],
+        // 表格样式
+        table_default_attributes: {
+            'class': 'table table-bordered'
+        },
+        // 段落格式
+        block_formats: '段落=p; 标题1=h1; 标题2=h2; 标题3=h3; 标题4=h4; 标题5=h5; 标题6=h6; 预格式=pre',
+        // 初始化完成回调
+        init_instance_callback: function (editor) {
+            console.log('TinyMCE编辑器初始化完成');
+            tinyMCEInstance = editor;
+        }
+    });
+}
+
+// 销毁TinyMCE编辑器
+function destroyTinyMCE() {
+    if (tinyMCEInstance) {
+        tinymce.remove('#content');
+        tinyMCEInstance = null;
+    }
+}
+
+// 初始化Markdown编辑器
+function initMarkdownEditor() {
+    const textarea = document.getElementById('content');
+    const previewDiv = document.getElementById('markdown-preview');
+    const previewContent = document.getElementById('preview-content');
+    
+    // 显示预览区域
+    previewDiv.style.display = 'block';
+    
+    // 添加Markdown工具栏
+    if (!document.getElementById('markdown-toolbar')) {
+        const toolbar = document.createElement('div');
+        toolbar.id = 'markdown-toolbar';
+        toolbar.className = 'btn-toolbar mb-2';
+        toolbar.innerHTML = `
+            <div class="btn-group btn-group-sm me-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('**', '**', '粗体文本')" title="粗体">
+                    <i class="fas fa-bold"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('*', '*', '斜体文本')" title="斜体">
+                    <i class="fas fa-italic"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('~~', '~~', '删除线文本')" title="删除线">
+                    <i class="fas fa-strikethrough"></i>
+                </button>
+            </div>
+            <div class="btn-group btn-group-sm me-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('# ', '', '标题')" title="标题1">H1</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('## ', '', '标题')" title="标题2">H2</button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('### ', '', '标题')" title="标题3">H3</button>
+            </div>
+            <div class="btn-group btn-group-sm me-2">
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('[', '](链接地址)', '链接文本')" title="链接">
+                    <i class="fas fa-link"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('![](', ')', '图片描述')" title="图片">
+                    <i class="fas fa-image"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('\`\`\`\\n', '\\n\`\`\`', '代码内容')" title="代码块">
+                    <i class="fas fa-code"></i>
+                </button>
+            </div>
+            <div class="btn-group btn-group-sm">
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('- ', '', '列表项')" title="无序列表">
+                    <i class="fas fa-list-ul"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('1. ', '', '列表项')" title="有序列表">
+                    <i class="fas fa-list-ol"></i>
+                </button>
+                <button type="button" class="btn btn-outline-secondary" onclick="insertMarkdown('> ', '', '引用内容')" title="引用">
+                    <i class="fas fa-quote-right"></i>
+                </button>
+            </div>
+        `;
+        textarea.parentNode.insertBefore(toolbar, textarea);
+    }
+    
+    // 监听输入变化，实时更新预览
+    textarea.addEventListener('input', function() {
+        updateMarkdownPreview();
+    });
+    
+    // 初始预览
+    updateMarkdownPreview();
+}
+
+// 清理Markdown编辑器
+function cleanupMarkdownEditor() {
+    const previewDiv = document.getElementById('markdown-preview');
+    const toolbar = document.getElementById('markdown-toolbar');
+    
+    if (previewDiv) {
+        previewDiv.style.display = 'none';
+    }
+    
+    if (toolbar) {
+        toolbar.remove();
+    }
+}
+
+// 插入Markdown语法
+function insertMarkdown(prefix, suffix, placeholder) {
+    const textarea = document.getElementById('content');
+    const start = textarea.selectionStart;
+    const end = textarea.selectionEnd;
+    const selectedText = textarea.value.substring(start, end);
+    const insertText = selectedText || placeholder;
+    
+    const newText = prefix + insertText + suffix;
+    textarea.value = textarea.value.substring(0, start) + newText + textarea.value.substring(end);
+    
+    // 设置光标位置
+    if (selectedText) {
+        textarea.setSelectionRange(start, start + newText.length);
+    } else {
+        textarea.setSelectionRange(start + prefix.length, start + prefix.length + placeholder.length);
+    }
+    
+    textarea.focus();
+    updateMarkdownPreview();
+}
+
+// 更新Markdown预览
+function updateMarkdownPreview() {
+    const textarea = document.getElementById('content');
+    const previewContent = document.getElementById('preview-content');
+    
+    if (textarea && previewContent) {
+        const markdownText = textarea.value;
+        const htmlContent = marked.parse(markdownText);
+        previewContent.innerHTML = htmlContent;
+    }
+}
+
+// 编辑器模式切换
+document.addEventListener('DOMContentLoaded', function() {
+    const richEditorRadio = document.getElementById('rich-editor');
+    const markdownEditorRadio = document.getElementById('markdown-editor');
+    
+    // 默认初始化富文本编辑器
+    initTinyMCE();
+    
+    richEditorRadio.addEventListener('change', function() {
+        if (this.checked) {
+            currentEditorMode = 'rich';
+            cleanupMarkdownEditor();
+            setTimeout(() => {
+                initTinyMCE();
+            }, 100);
+        }
+    });
+    
+    markdownEditorRadio.addEventListener('change', function() {
+        if (this.checked) {
+            currentEditorMode = 'markdown';
+            destroyTinyMCE();
+            setTimeout(() => {
+                initMarkdownEditor();
+            }, 100);
+        }
+    });
+});
+
+// 表单提交前验证
 document.querySelector('form').addEventListener('submit', function(e) {
     const title = document.getElementById('title').value.trim();
-    const content = document.getElementById('content').value.trim();
+    let content = '';
+    
+    if (currentEditorMode === 'rich' && tinyMCEInstance) {
+        // 获取TinyMCE编辑器内容
+        content = tinyMCEInstance.getContent().trim();
+        // 确保TinyMCE内容同步到textarea
+        tinymce.triggerSave();
+    } else {
+        // 获取普通textarea内容
+        content = document.getElementById('content').value.trim();
+    }
     
     if (!title || !content) {
         e.preventDefault();
         alert('标题和内容不能为空');
+        return false;
     }
 });
 </script>

@@ -1251,3 +1251,130 @@ footer {
         padding: 1px 3px;
     }
 }
+
+/* 富文本编辑器样式 */
+.editor-mode-selector {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.editor-mode-selector .btn-check:checked + .btn-outline-primary {
+    background-color: var(--primary-color);
+    border-color: var(--primary-color);
+    color: white;
+}
+
+#markdown-toolbar {
+    background: #f8f9fa;
+    padding: 10px;
+    border: 1px solid #e9ecef;
+    border-bottom: none;
+    border-radius: 8px 8px 0 0;
+}
+
+#markdown-toolbar .btn {
+    margin-right: 2px;
+}
+
+#markdown-preview {
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    background: #f8f9fa;
+}
+
+#markdown-preview h6 {
+    color: var(--primary-color);
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+#preview-content {
+    background: white;
+    border-radius: 6px;
+    padding: 15px;
+    min-height: 100px;
+    font-family: 'Arial', 'Microsoft YaHei', sans-serif;
+    line-height: 1.6;
+}
+
+#preview-content h1,
+#preview-content h2,
+#preview-content h3,
+#preview-content h4,
+#preview-content h5,
+#preview-content h6 {
+    color: var(--dark-color);
+    margin-bottom: 10px;
+}
+
+#preview-content p {
+    margin-bottom: 15px;
+}
+
+#preview-content pre {
+    background: #f4f4f4;
+    padding: 10px;
+    border-radius: 4px;
+    border-left: 4px solid var(--primary-color);
+    overflow-x: auto;
+}
+
+#preview-content code {
+    background: #f4f4f4;
+    padding: 2px 4px;
+    border-radius: 3px;
+    font-family: 'Courier New', monospace;
+}
+
+#preview-content blockquote {
+    border-left: 4px solid var(--primary-color);
+    padding-left: 15px;
+    margin: 15px 0;
+    color: #666;
+    font-style: italic;
+}
+
+#preview-content ul,
+#preview-content ol {
+    padding-left: 20px;
+    margin-bottom: 15px;
+}
+
+#preview-content table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 15px;
+}
+
+#preview-content table th,
+#preview-content table td {
+    border: 1px solid #ddd;
+    padding: 8px;
+    text-align: left;
+}
+
+#preview-content table th {
+    background-color: #f4f4f4;
+    font-weight: 600;
+}
+
+/* TinyMCE编辑器样式调整 */
+.tox-tinymce {
+    border-radius: 8px !important;
+    border: 2px solid #e9ecef !important;
+}
+
+.tox-tinymce:focus-within {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.25) !important;
+}
+
+/* Markdown编辑器textarea样式 */
+.markdown-mode #content {
+    border-radius: 0 0 8px 8px;
+    border-top: none;
+    font-family: 'Courier New', monospace;
+    font-size: 14px;
+    line-height: 1.5;
+    resize: vertical;
+}
